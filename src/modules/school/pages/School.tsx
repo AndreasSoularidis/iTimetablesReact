@@ -4,12 +4,19 @@ import {
   Descriptions,
   Divider,
   Space,
-  Tooltip,
   type CheckboxOptionType,
   type DescriptionsProps,
 } from "antd";
+import { useState } from "react";
+import AddEditSchool from "./components/AddEditSchool";
 
 export default function School() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
   const items: DescriptionsProps["items"] = [
     {
       key: "1",
@@ -38,7 +45,7 @@ export default function School() {
     },
   ];
 
-  const optionsWithDisabled: CheckboxOptionType<string>[] = [
+  const zoneOptions: CheckboxOptionType<string>[] = [
     { label: "Πρωινή Ζώνη", value: "morning", className: "label-2" },
     { label: "Ολοήμερο", value: "afternoonZone", className: "label-3" },
     {
@@ -56,7 +63,7 @@ export default function School() {
         <Button
           type="primary"
           // icon={<PlusOutlined />}
-          // onClick={modifyShowAddModal}
+          onClick={showModal}
         >
           Επεξεργασία
         </Button>
@@ -64,9 +71,14 @@ export default function School() {
       <Descriptions layout="vertical" items={items} />
       <br />
       <Checkbox.Group
-        options={optionsWithDisabled}
+        options={zoneOptions}
         disabled
         defaultValue={["morning", "afternoonZone"]}
+      />
+      <AddEditSchool
+        isModalOpen={isModalOpen}
+        modifyIsModalOpen={setIsModalOpen}
+        zoneOptions={zoneOptions}
       />
     </>
   );
