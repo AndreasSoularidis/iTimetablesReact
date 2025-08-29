@@ -7,11 +7,14 @@ import {
   type CheckboxOptionType,
   type DescriptionsProps,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddEditSchool from "../components/AddEditSchool";
+import type { ISchoolGet } from "../types";
+import { SchoolService } from "../services/SchoolService";
 
 export default function School() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [data, setData] = useState<ISchoolGet | null>(null);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -54,6 +57,14 @@ export default function School() {
       className: "label-4",
     },
   ];
+
+  useEffect(() => {
+    const response = SchoolService.get("5007643e-04ec-4176-a8fe-0550f5cd7c73");
+    response.then((res) => {
+      setData(data);
+      console.log(res);
+    });
+  }, []);
 
   return (
     <>
