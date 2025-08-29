@@ -4,10 +4,22 @@ import Sidebar from "./shared/layouts/sidebar/Sidebar";
 import { Content } from "antd/es/layout/layout";
 import TopMenu from "./shared/layouts/TopMenu/TopMenu";
 import School from "./modules/school/pages/School";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <Layout style={{ minHeight: "100vh", padding: 0 }}>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <TopMenu />
       <Layout>
         <Sidebar />

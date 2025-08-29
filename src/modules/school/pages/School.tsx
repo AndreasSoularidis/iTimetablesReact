@@ -8,7 +8,7 @@ import {
   type DescriptionsProps,
 } from "antd";
 import { useState } from "react";
-import AddEditSchool from "./components/AddEditSchool";
+import AddEditSchool from "../components/AddEditSchool";
 
 export default function School() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +46,7 @@ export default function School() {
   ];
 
   const zoneOptions: CheckboxOptionType<string>[] = [
-    { label: "Πρωινή Ζώνη", value: "morning", className: "label-2" },
+    { label: "Πρωινή Ζώνη", value: "morningZone", className: "label-2" },
     { label: "Ολοήμερο", value: "afternoonZone", className: "label-3" },
     {
       label: "Διευριμένο Ολοήμερο",
@@ -73,7 +73,7 @@ export default function School() {
       <Checkbox.Group
         options={zoneOptions}
         disabled
-        defaultValue={["morning", "afternoonZone"]}
+        defaultValue={["morningZone", "afternoonZone"]}
       />
       <AddEditSchool
         isModalOpen={isModalOpen}
