@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 async function getSchoolData(managerId: string): Promise<ISchoolGet | null> {
   try {
     const response = await axios.get(
-      `https://localhost:7065/api/schools/${managerId}`
+      `http://localhost:5191/api/schools/${managerId}`
     );
     return response.data;
   } catch (error) {
@@ -16,7 +16,7 @@ async function getSchoolData(managerId: string): Promise<ISchoolGet | null> {
 
 async function insertSchoolData(data: ISchoolPost) {
   try {
-    await axios.post("https://localhost:7065/api/schools/", data);
+    await axios.post("http://localhost:5191/api/schools/", data);
     toast.success(
       "Τα στοιχεία της σχολικής μονάδας αποθηκεύτηκαν με επιτυχία!"
     );

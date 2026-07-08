@@ -4,21 +4,29 @@ export interface ISchoolGrade {
 }
 
 export interface ILookup {
-  Id: string;
-  Description: string;
+  id: string;
+  description: string;
+}
+
+export interface IDirector {
+  id: string;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  email: string;
 }
 
 export interface ISchoolGet {
-  Id: string;
-  Name: string;
-  SchoolYear: string;
-  TeachingDays: number;
-  MaxHoursPerDay: number;
-  MorningZone: boolean;
-  AfternoonZone: boolean;
-  ExtendedAfternoonZone: boolean;
-  Manager: ILookup;
-  SchoolGrade: ILookup;
+  id: string;
+  name: string;
+  schoolYear: string;
+  teachingDays: number;
+  maxHoursPerDay: number;
+  morningZone: boolean;
+  afternoonZone: boolean;
+  extendedAfternoonZone: boolean;
+  director: IDirector;
+  schoolGrade: ILookup;
 }
 
 export interface ISchoolPost {

@@ -29,7 +29,7 @@ export default function AddEditSchool({
     const fetchSchoolGrades = async () => {
       try {
         const response = await axios.get(
-          "https://localhost:7065/api/schoolgrades/"
+          "http://localhost:5191/api/schoolgrades/"
         );
         const fetchedSchoolGrades = response.data.schoolGrades;
         console.log(fetchedSchoolGrades);

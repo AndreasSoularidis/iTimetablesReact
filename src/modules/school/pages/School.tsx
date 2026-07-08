@@ -14,39 +14,40 @@ import { SchoolService } from "../services/SchoolService";
 
 export default function School() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [data, setData] = useState<ISchoolGet | null>(null);
+  const [data, setData] = useState<ISchoolGet>();
+  const [items, setItems] = useState<DescriptionsProps["items"]>([]);
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const items: DescriptionsProps["items"] = [
-    {
-      key: "1",
-      label: "Σχολική Μονάδα",
-      children: "3ο Δημοτικό Σχολείο Νίκαιας",
-    },
-    {
-      key: "2",
-      label: "Βαθμίδα",
-      children: "Δημοτικό",
-    },
-    {
-      key: "3",
-      label: "Σχολικό Έτος",
-      children: "2025-2026",
-    },
-    {
-      key: "4",
-      label: "Ημέρες Διδασκαλίας",
-      children: "5",
-    },
-    {
-      key: "5",
-      label: "Μέγιστες Ώρες Διδασκαλίας",
-      children: "6",
-    },
-  ];
+  // const items: DescriptionsProps["items"] = [
+  //   {
+  //     key: "1",
+  //     label: "Σχολική Μονάδα",
+  //     children: "3ο Δημοτικό Σχολείο Νίκαιας",
+  //   },
+  //   {
+  //     key: "2",
+  //     label: "Βαθμίδα",
+  //     children: "Δημοτικό",
+  //   },
+  //   {
+  //     key: "3",
+  //     label: "Σχολικό Έτος",
+  //     children: "2025-2026",
+  //   },
+  //   {
+  //     key: "4",
+  //     label: "Ημέρες Διδασκαλίας",
+  //     children: "5",
+  //   },
+  //   {
+  //     key: "5",
+  //     label: "Μέγιστες Ώρες Διδασκαλίας",
+  //     children: "6",
+  //   },
+  // ];
 
   const zoneOptions: CheckboxOptionType<string>[] = [
     { label: "Πρωινή Ζώνη", value: "morningZone", className: "label-2" },
@@ -59,10 +60,18 @@ export default function School() {
   ];
 
   useEffect(() => {
-    const response = SchoolService.get("5007643e-04ec-4176-a8fe-0550f5cd7c73");
+    const response = SchoolService.get("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
     response.then((res) => {
-      setData(data);
+      if (!res) return;
+      setData(res);
       console.log(res);
+      setItems([
+        { key: "1", label: "Σχολική Μονάδα", children: res.name },
+        { key: "2", label: "Βαθμίδα", children: res.schoolGrade?.description ?? "" },
+        { key: "3", label: "Σχολικό Έτος", children: res.schoolYear ?? "" },
+        { key: "4", label: "Ημέρες Διδασκαλίας", children: res.teachingDays },
+        { key: "5", label: "Μέγιστες Ώρες Διδασκαλίας", children: res.maxHoursPerDay },
+      ]);
     });
   }, []);
 
