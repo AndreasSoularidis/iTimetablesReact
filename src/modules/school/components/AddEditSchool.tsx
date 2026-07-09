@@ -7,59 +7,78 @@ import {
   Select,
   type CheckboxOptionType,
 } from "antd";
-import axios from "axios";
 import { useEffect, useState } from "react";
-import type { ISchoolPost } from "../types";
-import { SchoolService } from "../services/SchoolService";
+import type { ISchoolGet, ISchoolPost } from "../types";
+import axios from "axios";
+
 interface IProps {
   isModalOpen: boolean;
   modifyIsModalOpen: (value: boolean) => void;
+  defaultEditValues: ISchoolGet | null;
   zoneOptions: CheckboxOptionType<string>[];
+  onSubmit: (school: ISchoolPost) => Promise<void>;
 }
 export default function AddEditSchool({
   isModalOpen,
   modifyIsModalOpen,
   zoneOptions,
+  defaultEditValues,
+  onSubmit,
 }: IProps) {
-  const [schoolgrades, setSchoolGrades] = useState<
+  const [schoolTypes, setSchoolTypes] = useState<
     { id: string; description: string }[]
   >([]);
   const [form] = Form.useForm();
+
   useEffect(() => {
-    const fetchSchoolGrades = async () => {
+    if (isModalOpen && defaultEditValues) {
+      form.setFieldsValue({
+        SchoolUnit: defaultEditValues.name,
+        SchoolYear: defaultEditValues.schoolYear,
+        TeachingDays: defaultEditValues.teachingDays,
+        TeachingHours: defaultEditValues.maxHoursPerDay,
+        AvailableZones: [
+          defaultEditValues.morningZone ? "morningZone" : null,
+          defaultEditValues.afternoonZone ? "afternoonZone" : null,
+          defaultEditValues.extendedAfternoonZone ? "extendedAfternoonZone" : null,
+        ].filter(Boolean),
+        SchoolType: defaultEditValues.schoolType?.description ?? "",
+      });
+    }
+  }, [isModalOpen, defaultEditValues, form]);
+
+  useEffect(() => {
+    async function fetchSchoolTypes() {
       try {
-        const response = await axios.get(
-          "http://localhost:5191/api/schoolgrades/"
-        );
-        const fetchedSchoolGrades = response.data.schoolGrades;
-        console.log(fetchedSchoolGrades);
-        setSchoolGrades(fetchedSchoolGrades);
+        const response = await axios.get("http://localhost:5191/api/schoolTypes");
+        setSchoolTypes(response.data.schoolTypes);
       } catch (error) {
-        console.error("Error fetching school grades:", error);
+        console.error("Error fetching school types:", error);
       }
-    };
-    fetchSchoolGrades();
+    }
+    fetchSchoolTypes();
   }, []);
+
 
   const handleOk = async () => {
     try {
       const values = form.getFieldsValue();
 
       const dataToSubmit: ISchoolPost = {
-        Name: values.SchoolUnit,
-        SchoolYear: values.SchoolYear,
-        TeachingDays: values.TeachingDays,
-        MaxHoursPerDay: values.TeachingHours,
-        MorningZone: values.AvailableZones?.includes("morningZone") || false,
-        AfternoonZone:
+        name: values.SchoolUnit,
+        schoolYear: values.SchoolYear,
+        teachingDays: values.TeachingDays,
+        maxHoursPerDay: values.TeachingHours,
+        morningZone: values.AvailableZones?.includes("morningZone") || false,
+        afternoonZone:
           values.AvailableZones?.includes("afternoonZone") || false,
-        ExtendedAfternoonZone:
+        extendedAfternoonZone:
           values.AvailableZones?.includes("extendedAfternoonZone") || false,
-        ManagerId: "5007643e-04ec-4176-a8fe-0550f5cd7c73",
-        GradeId: values.SchoolGrade,
+        directorId: "5007643e-04ec-4176-a8fe-0550f5cd7c73",
+        schoolTypeId: values.SchoolType,
       };
       console.log("Data to submit", dataToSubmit);
-      await SchoolService.insert(dataToSubmit);
+      await onSubmit(dataToSubmit);
       form.resetFields();
     } catch (error) {
       console.error("Error adding/editing school:", error);
@@ -91,11 +110,12 @@ export default function AddEditSchool({
           <Input />
         </Form.Item>
 
-        <Form.Item label="Βαθμίδα Εκπαίδευσης" name="SchoolGrade">
+        <Form.Item label="Βαθμίδα Εκπαίδευσης" name="SchoolType">
           <Select
-            options={schoolgrades.map((grade) => ({
-              label: grade.description,
-              value: grade.id,
+            options={schoolTypes.map((type) => ({
+              key: type.id,
+              value: type.id,
+              label: type.description,
             }))}
             placeholder="Επιλέξτε βαθμίδα"
           />

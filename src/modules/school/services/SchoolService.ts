@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ISchoolGet, ISchoolPost } from "../types";
+import type { ISchoolGet, ISchoolPost, ISchoolPut } from "../types";
 import { toast } from "react-toastify";
 
 async function getSchoolData(managerId: string): Promise<ISchoolGet | null> {
@@ -28,7 +28,19 @@ async function insertSchoolData(data: ISchoolPost) {
     console.error("Error adding/editing school:", error);
   }
 }
+
+async function updateSchoolUnit(schoolUnit: ISchoolPut){
+  try{
+    await axios.put(`http://localhost:5191/api/schools/${schoolUnit.id}`, schoolUnit);
+    toast.success("Τα στοιχεία της σχολικής μονάδας ενημερώθηκαν με επιτυχία!");
+  }catch(error){
+    console.error("Error updating school unit:", error);
+    toast.error("Σφάλμα κατά την ενημέρωση των στοιχείων της σχολικής μονάδας.");
+  }
+}
+
 export const SchoolService = {
   insert: insertSchoolData,
   get: getSchoolData,
+  update: updateSchoolUnit,
 };

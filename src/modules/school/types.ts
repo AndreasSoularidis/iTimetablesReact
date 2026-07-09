@@ -26,17 +26,30 @@ export interface ISchoolGet {
   afternoonZone: boolean;
   extendedAfternoonZone: boolean;
   director: IDirector;
-  schoolGrade: ILookup;
+  schoolType: ILookup;
 }
 
 export interface ISchoolPost {
-  Name: string;
-  SchoolYear: string;
-  TeachingDays: number;
-  MaxHoursPerDay: number;
-  MorningZone: boolean;
-  AfternoonZone: boolean;
-  ExtendedAfternoonZone: boolean;
-  ManagerId: string;
-  GradeId: string;
+  name: string;
+  schoolYear: string;
+  teachingDays: number;
+  maxHoursPerDay: number;
+  morningZone: boolean;
+  afternoonZone: boolean;
+  extendedAfternoonZone: boolean;
+  directorId: string;
+  schoolTypeId: string;
+}
+
+export interface ISchoolPut {
+  id: string;
+  name: string;
+  schoolYear: string;
+  teachingDays: number;
+  maxHoursPerDay: number;
+  morningZone: boolean;
+  afternoonZone: boolean;
+  extendedAfternoonZone: boolean;
+  directorId: string;
+  schoolTypeId: string;
 }

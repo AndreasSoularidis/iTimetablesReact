@@ -9,45 +9,56 @@ import {
 } from "antd";
 import { useEffect, useState } from "react";
 import AddEditSchool from "../components/AddEditSchool";
-import type { ISchoolGet } from "../types";
+import type { ISchoolGet, ISchoolPost, ISchoolPut } from "../types";
 import { SchoolService } from "../services/SchoolService";
 
 export default function School() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<ISchoolGet>();
   const [items, setItems] = useState<DescriptionsProps["items"]>([]);
+  const [editingRecord, setEditingRecord] = useState<ISchoolGet | null>(null);
 
-  const showModal = () => {
-    setIsModalOpen(true);
+  const handleSubmit = async (school: ISchoolPost) => {
+    try{
+      if(editingRecord) {
+        const schoolToUpdate: ISchoolPut = {
+          id: editingRecord.id,
+          name: school.name,
+          schoolYear: school.schoolYear,
+          teachingDays: school.teachingDays,
+          maxHoursPerDay: school.maxHoursPerDay,
+          morningZone: school.morningZone,
+          afternoonZone: school.afternoonZone,
+          extendedAfternoonZone: school.extendedAfternoonZone,
+          directorId: school.directorId,
+          schoolTypeId: school.schoolTypeId,
+        };
+        await SchoolService.update(schoolToUpdate);
+      } else{
+        await SchoolService.insert(school);
+      }
+    } catch (error) {
+      console.error("Error submitting school:", error);
+    }
+    setIsModalOpen(false);
   };
 
-  // const items: DescriptionsProps["items"] = [
-  //   {
-  //     key: "1",
-  //     label: "Σχολική Μονάδα",
-  //     children: "3ο Δημοτικό Σχολείο Νίκαιας",
-  //   },
-  //   {
-  //     key: "2",
-  //     label: "Βαθμίδα",
-  //     children: "Δημοτικό",
-  //   },
-  //   {
-  //     key: "3",
-  //     label: "Σχολικό Έτος",
-  //     children: "2025-2026",
-  //   },
-  //   {
-  //     key: "4",
-  //     label: "Ημέρες Διδασκαλίας",
-  //     children: "5",
-  //   },
-  //   {
-  //     key: "5",
-  //     label: "Μέγιστες Ώρες Διδασκαλίας",
-  //     children: "6",
-  //   },
-  // ];
+  const handleEdit = (record: ISchoolGet) => {
+    // const recordToEdit: ISchoolPut = {
+    //   id: record.id,
+    //   name: record.name,
+    //   schoolYear: record.schoolYear,
+    //   teachingDays: record.teachingDays,
+    //   maxHoursPerDay: record.maxHoursPerDay,
+    //   morningZone: record.morningZone,
+    //   afternoonZone: record.afternoonZone,
+    //   extendedAfternoonZone: record.extendedAfternoonZone,
+    //   directorId: record.director.id,
+    //   schoolTypeId: record.schoolType.id,
+    // };
+    setIsModalOpen(true);
+    setEditingRecord(record);
+  };
 
   const zoneOptions: CheckboxOptionType<string>[] = [
     { label: "Πρωινή Ζώνη", value: "morningZone", className: "label-2" },
@@ -67,7 +78,7 @@ export default function School() {
       console.log(res);
       setItems([
         { key: "1", label: "Σχολική Μονάδα", children: res.name },
-        { key: "2", label: "Βαθμίδα", children: res.schoolGrade?.description ?? "" },
+        { key: "2", label: "Βαθμίδα", children: res.schoolType?.description ?? "" },
         { key: "3", label: "Σχολικό Έτος", children: res.schoolYear ?? "" },
         { key: "4", label: "Ημέρες Διδασκαλίας", children: res.teachingDays },
         { key: "5", label: "Μέγιστες Ώρες Διδασκαλίας", children: res.maxHoursPerDay },
@@ -83,7 +94,7 @@ export default function School() {
         <Button
           type="primary"
           // icon={<PlusOutlined />}
-          onClick={showModal}
+          onClick={() => handleEdit(data!)}
         >
           Επεξεργασία
         </Button>
@@ -98,7 +109,9 @@ export default function School() {
       <AddEditSchool
         isModalOpen={isModalOpen}
         modifyIsModalOpen={setIsModalOpen}
+        defaultEditValues={editingRecord ?? null}
         zoneOptions={zoneOptions}
+        onSubmit={handleSubmit}
       />
     </>
   );
