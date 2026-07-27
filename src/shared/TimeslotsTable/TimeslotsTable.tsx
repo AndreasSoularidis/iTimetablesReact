@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Teacher } from "../../modules/timetable/types";
 
-export default function TimeslotsTable({ timeslots }: { timeslots: Teacher[][] }) {
+export default function TimeslotsTable({ timeslots, hours, days, classes }: { timeslots: Teacher[][], hours: number, days: number, classes: string[] }) {
     const [teacher, setTeacher] = useState<Teacher[][]>(() =>
         timeslots.map(row => [...row])
     );
@@ -10,17 +10,15 @@ export default function TimeslotsTable({ timeslots }: { timeslots: Teacher[][] }
         setTeacher(timeslots.map(row => [...row]));
     }, [timeslots]);
 
-    const DAY_LETTERS = ["Α", "Β", "Γ", "Δ", "Ε", "ΣΤ1", "ΣΤ2"];
-
     return (
         <>
         <table style={{ borderCollapse: "collapse" }}>
             <thead>
                 <tr>
                     <th />
-                    {Array.from({ length: 30 }, (_, i) => (
+                    {Array.from({ length: hours*days }, (_, i) => (
                         <th key={i} style={{ width: 44, textAlign: "center", paddingBottom: 4, fontWeight: 600 }}>
-                            {(i % 6) + 1}
+                            {(i % hours) + 1}
                         </th>
                     ))}
                 </tr>
@@ -29,7 +27,7 @@ export default function TimeslotsTable({ timeslots }: { timeslots: Teacher[][] }
                 {teacher.map((row, rowIndex) => (
                     <tr key={rowIndex}>
                         <td style={{ paddingRight: 6, fontWeight: 600, textAlign: "center" }}>
-                            {DAY_LETTERS[rowIndex]}
+                            {classes[rowIndex]}
                         </td>
                         {row.map((value, colIndex) => (
                             <td key={colIndex} style={{ padding: 2 }}>

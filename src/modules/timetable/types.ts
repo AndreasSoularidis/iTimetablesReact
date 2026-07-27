@@ -4,6 +4,14 @@ export interface TimetablesGet {
     fitness: number;
     description: string[];
     timeslots: Teacher[][];
+    school: SchoolData;
+}
+
+export interface SchoolData {
+    name: string;
+    maxHoursPerDay: number;
+    teachingDays: number;
+    schoolClasses: string[];
 }
 
 export interface Teacher{
@@ -20,4 +28,5 @@ export interface TimetableEntity {
     fitness: number;
     description: string[];
     timeslots: Teacher[][];
+    school: SchoolData;
 }

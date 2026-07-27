@@ -47,9 +47,9 @@ export default function Timetable() {
                 Eξαγωγή σε Excel 
                 </Button>
             </Space>
-            {data.length > 0 && <TimeslotsTable timeslots={data[0].timeslots} />}
+            {data.length > 0 && <TimeslotsTable timeslots={data[0].timeslots} hours={data[0].school.maxHoursPerDay} days={data[0].school.teachingDays} classes={data[0].school.schoolClasses} />}
             <Descriptions title="" items={details} style={{ marginTop: 16 }} />
-            <Divider titlePlacement="start">Παραβιάσεις</Divider>
+            <Divider orientation="start" orientationMargin={0}>Παραβιάσεις</Divider>
             <List
                 size="large"
                 bordered

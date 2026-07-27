@@ -9,5 +9,11 @@ export function useTimetables(requestData: any): TimetableEntity[] {
       fitness: teaching.fitness,
       description: teaching.description,
       timeslots: teaching.timeslots,
+      school: {
+        name: teaching.school.name,
+        maxHoursPerDay: teaching.school.maxHoursPerDay,
+        teachingDays: teaching.school.teachingDays,
+        schoolClasses: teaching.school.schoolClasses,
+      }
     }))
 }
