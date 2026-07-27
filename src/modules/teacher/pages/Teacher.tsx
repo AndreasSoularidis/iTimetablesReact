@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import type { TeacherEntity } from "../types";
 import { TeacherService } from "../services/TeacherService";
 import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTable";
+import AddEditTeacher from "../components/AddEditTeacher";
+import type { TeacherPost } from "../types";
 
 export default function Teacher() {
   const [data, setData] = useState<TeacherEntity[]>([]);
@@ -19,9 +21,16 @@ export default function Teacher() {
     setDrawerOpen(false);
   }
 
-  const handleCreate = () => {
-    setModalOpen(true);
-  }
+  const handleSubmit = async (teacher: TeacherPost) => {
+    try{
+        await TeacherService.insert(teacher);
+        const response = await TeacherService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+        setData(response);
+    } catch (error) {
+      console.error("Error submitting teacher:", error);
+    }
+    setModalOpen(false);
+  };
 
   const renderActions = (value: any, record: TeacherEntity, index: number) => {
     return (
@@ -89,7 +98,7 @@ export default function Teacher() {
           size="large"
           icon={<PlusOutlined />}
           style={{ fontSize: 16, padding: "0 16px" }}
-          onClick={() => handleCreate()}
+          onClick={() => setModalOpen(true)}
         >
           Προσθήκη
         </Button>
@@ -153,10 +162,16 @@ export default function Teacher() {
               ]}
             />
             <Divider orientation="left" orientationMargin={0} style={{ marginTop: 20 }}>Διαθεσιμότητες</Divider>
-            <AvailabilityTable availbility={Array.from({ length: 5 }, (_, i) => selectedTeacher.availabilities.slice(i * 6, i * 6 + 6))} />
+            <AvailabilityTable availability={Array.from({ length: 5 }, (_, i) => selectedTeacher.availabilities.slice(i * 6, i * 6 + 6))} />
           </>
         )}
       </Drawer>
+      <AddEditTeacher
+        isModalOpen={modalOpen}
+        modifyIsModalOpen={setModalOpen}
+        // defaultEditValues={selectedTeacher ?? null}
+        onSubmit={handleSubmit}
+      />
     </>
   );
 }

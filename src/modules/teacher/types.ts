@@ -14,11 +14,18 @@ export interface TeacherPost {
     firstName: string;
     lastName: string;
     short: string;
+    mandatoryTeachingHours: number;
     color: string;
     continuousTeachingHours: number;
     availabilities: number[];
-    teachings: Teachings[];
-    specialty: string;
+    specialtyId: string;
+    schoolUnitId: string;
+}
+
+export interface Specialty{
+    id: string;
+    code: string;
+    title: string;
 }
 
 export interface LookUp{

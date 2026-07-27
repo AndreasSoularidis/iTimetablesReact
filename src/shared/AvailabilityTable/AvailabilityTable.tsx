@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 
 const STATUS_COLORS: Record<number, string> = {
     0: "#52c41a", // Available
@@ -16,22 +15,15 @@ const STATUS_LABELS: Record<number, string> = {
     4: "Ανεπιθύμητη Διδασκαλία",
 };
 
-export default function AvailabilityTable({ availbility }: { availbility: number[][] }) {
-    const [availabilities, setAvailabilities] = useState<number[][]>(() =>
-        availbility.map(row => [...row])
-    );
+interface IProps {
+  availability: number[][];
+  handleSelectSquare?: (rowIndex: number, colIndex: number) => void;
+}
 
-    useEffect(() => {
-        setAvailabilities(availbility.map(row => [...row]));
-    }, [availbility]);
-
-    function handleSelectSquare(rowIndex: number, colIndex: number) {
-        setAvailabilities((prevAvailabilities) => {
-            const updatedAvailabilities = prevAvailabilities.map(row => [...row]);
-            updatedAvailabilities[rowIndex][colIndex] = (updatedAvailabilities[rowIndex][colIndex] + 1) % 5;
-            return updatedAvailabilities;
-        });
-    }
+export default function AvailabilityTable({ availability, handleSelectSquare }: IProps) {
+    // useEffect(() => {
+    //     setAvailabilities(availability.map(row => [...row]));
+    // }, [availability]);
 
     const DAY_LETTERS = ["Δ", "Τ", "Τ", "Π", "Π"];
 
@@ -49,7 +41,7 @@ export default function AvailabilityTable({ availbility }: { availbility: number
                 </tr>
             </thead>
             <tbody>
-                {availabilities.map((row, rowIndex) => (
+                {availability.map((row, rowIndex) => (
                     <tr key={rowIndex}>
                         <td style={{ paddingRight: 6, fontWeight: 600, textAlign: "center" }}>
                             {DAY_LETTERS[rowIndex]}
@@ -57,8 +49,8 @@ export default function AvailabilityTable({ availbility }: { availbility: number
                         {row.map((value, colIndex) => (
                             <td key={colIndex} style={{ padding: 2 }}>
                                 <button
-                                    title={STATUS_LABELS[value]}
-                                    onClick={() => handleSelectSquare(rowIndex, colIndex)}
+                                    title={value !== undefined ? STATUS_LABELS[value] : STATUS_LABELS[0]}
+                                    onClick={() => handleSelectSquare?.(rowIndex, colIndex)}
                                     style={{
                                         width: 40,
                                         height: 40,
