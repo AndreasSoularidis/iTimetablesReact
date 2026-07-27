@@ -21,6 +21,17 @@ export default function Teacher() {
     setDrawerOpen(false);
   }
 
+  const handleEdit = (teacher: TeacherEntity) => {
+    setSelectedTeacher(teacher);
+    setModalOpen(true);
+  }
+
+  const handleDelete = async (teacher: TeacherEntity) => {
+    setDrawerOpen(false);
+    console.log("Delete clicked for record:", teacher);
+  }
+
+
   const handleSubmit = async (teacher: TeacherPost) => {
     try{
         await TeacherService.insert(teacher);
@@ -38,16 +49,14 @@ export default function Teacher() {
         <Tooltip placement="topLeft" title="Επεξεργασία">
           <Button
             type="default"
-            // disabled={!record.CanEdit}
-            // onClick={() => handleEdit(record)}
+            onClick={(e) => { e.stopPropagation(); handleEdit(record); }}
           >
             <EditFilled />
           </Button>
         </Tooltip>
         <Tooltip placement="topLeft" title="Διαγραφή">
           <Button
-            // disabled={!record.CanDelete}
-            // onClick={() => handleDelete(record)}
+             onClick={(e) => { e.stopPropagation(); handleDelete(record); }}
             danger
           >
             <DeleteFilled />
