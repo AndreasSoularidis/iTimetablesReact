@@ -25,9 +25,8 @@ export default function AddEditSchool({
   defaultEditValues,
   onSubmit,
 }: IProps) {
-  const [schoolTypes, setSchoolTypes] = useState<
-    { id: string; description: string }[]
-  >([]);
+  const [schoolTypes, setSchoolTypes] = useState<{ id: string; description: string }[]>([]);
+  const [selectedSchoolType, setSelectedSchoolType] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -44,6 +43,7 @@ export default function AddEditSchool({
         ].filter(Boolean),
         SchoolType: defaultEditValues.schoolType?.description ?? "",
       });
+      setSelectedSchoolType(defaultEditValues.schoolType?.id ?? null);
     }
   }, [isModalOpen, defaultEditValues, form]);
 
@@ -63,7 +63,6 @@ export default function AddEditSchool({
   const handleOk = async () => {
     try {
       const values = form.getFieldsValue();
-
       const dataToSubmit: ISchoolPost = {
         name: values.SchoolUnit,
         schoolYear: values.SchoolYear,
@@ -74,10 +73,9 @@ export default function AddEditSchool({
           values.AvailableZones?.includes("afternoonZone") || false,
         extendedAfternoonZone:
           values.AvailableZones?.includes("extendedAfternoonZone") || false,
-        directorId: "5007643e-04ec-4176-a8fe-0550f5cd7c73",
-        schoolTypeId: values.SchoolType,
+        directorId: "d8945131-d62f-4356-93fb-ffd9f71846eb",
+        schoolTypeId: selectedSchoolType || "", // Use the selected school type ID
       };
-      console.log("Data to submit", dataToSubmit);
       await onSubmit(dataToSubmit);
       form.resetFields();
     } catch (error) {
@@ -118,6 +116,10 @@ export default function AddEditSchool({
               label: type.description,
             }))}
             placeholder="Επιλέξτε βαθμίδα"
+            onChange={(value) => {
+              form.setFieldsValue({ SchoolType: value });
+              setSelectedSchoolType(value);
+            }}
           />
         </Form.Item>
         <Form.Item label="Σχολικό Έτος" name="SchoolYear">

@@ -34,6 +34,7 @@ export default function School() {
           schoolTypeId: school.schoolTypeId,
         };
         await SchoolService.update(schoolToUpdate);
+        setEditingRecord(null); // Clear the editing record after update
       } else{
         await SchoolService.insert(school);
       }
@@ -44,18 +45,6 @@ export default function School() {
   };
 
   const handleEdit = (record: ISchoolGet) => {
-    // const recordToEdit: ISchoolPut = {
-    //   id: record.id,
-    //   name: record.name,
-    //   schoolYear: record.schoolYear,
-    //   teachingDays: record.teachingDays,
-    //   maxHoursPerDay: record.maxHoursPerDay,
-    //   morningZone: record.morningZone,
-    //   afternoonZone: record.afternoonZone,
-    //   extendedAfternoonZone: record.extendedAfternoonZone,
-    //   directorId: record.director.id,
-    //   schoolTypeId: record.schoolType.id,
-    // };
     setIsModalOpen(true);
     setEditingRecord(record);
   };
@@ -63,11 +52,7 @@ export default function School() {
   const zoneOptions: CheckboxOptionType<string>[] = [
     { label: "Πρωινή Ζώνη", value: "morningZone", className: "label-2" },
     { label: "Ολοήμερο", value: "afternoonZone", className: "label-3" },
-    {
-      label: "Διευριμένο Ολοήμερο",
-      value: "extendedAfternoonZone",
-      className: "label-4",
-    },
+    { label: "Διευριμένο Ολοήμερο", value: "extendedAfternoonZone", className: "label-4" },
   ];
 
   useEffect(() => {
@@ -75,7 +60,6 @@ export default function School() {
     response.then((res) => {
       if (!res) return;
       setData(res);
-      console.log(res);
       setItems([
         { key: "1", label: "Σχολική Μονάδα", children: res.name },
         { key: "2", label: "Βαθμίδα", children: res.schoolType?.description ?? "" },
@@ -84,7 +68,7 @@ export default function School() {
         { key: "5", label: "Μέγιστες Ώρες Διδασκαλίας", children: res.maxHoursPerDay },
       ]);
     });
-  }, []);
+  }, [editingRecord]);
 
   return (
     <>
@@ -104,7 +88,11 @@ export default function School() {
       <Checkbox.Group
         options={zoneOptions}
         disabled
-        defaultValue={["morningZone", "afternoonZone"]}
+        value={[
+          data?.morningZone ? "morningZone" : null,
+          data?.afternoonZone ? "afternoonZone" : null,
+          data?.extendedAfternoonZone ? "extendedAfternoonZone" : null,
+        ].filter(Boolean) as string[]}
       />
       <AddEditSchool
         isModalOpen={isModalOpen}
