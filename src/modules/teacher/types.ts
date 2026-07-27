@@ -10,6 +10,17 @@ export interface TeacherGet {
     specialty: string;
 }
 
+export interface TeacherPost {
+    firstName: string;
+    lastName: string;
+    short: string;
+    color: string;
+    continuousTeachingHours: number;
+    availabilities: number[];
+    teachings: Teachings[];
+    specialty: string;
+}
+
 export interface LookUp{
     id: string;
     description: string;

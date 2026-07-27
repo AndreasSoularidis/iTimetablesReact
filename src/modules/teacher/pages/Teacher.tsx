@@ -1,4 +1,4 @@
-import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Badge, Tag } from "antd";
+import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag } from "antd";
 import { PlusOutlined, DeleteFilled, EditFilled  } from "@ant-design/icons";
 import type { TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
@@ -10,13 +10,17 @@ export default function Teacher() {
   const [data, setData] = useState<TeacherEntity[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherEntity | null>(null);
-
+  const [modalOpen, setModalOpen] = useState(false);
   const showDrawer = () => {
     setDrawerOpen(true);
   }
 
   const onClose = () => {
     setDrawerOpen(false);
+  }
+
+  const handleCreate = () => {
+    setModalOpen(true);
   }
 
   const renderActions = (value: any, record: TeacherEntity, index: number) => {
@@ -85,6 +89,7 @@ export default function Teacher() {
           size="large"
           icon={<PlusOutlined />}
           style={{ fontSize: 16, padding: "0 16px" }}
+          onClick={() => handleCreate()}
         >
           Προσθήκη
         </Button>
