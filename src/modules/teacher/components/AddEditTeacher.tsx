@@ -149,11 +149,10 @@ export default function AddEditTeacher({
             <ColorPicker onChange={(color) => form.setFieldsValue({ color: color.toHexString() })} />
           </Form.Item>
         </Form.Item>
-        <Form.Item name="maxTeachingHours" label="Μέγιστες συνεχόμενες ώρες διδασκαλίας">
+        <Form.Item name="maxTeachingHours" label="Μέγιστες συνεχόμενες ώρες διδασκαλίας" initialValue={4}>
           <Slider
             min={1}
             max={7}
-            defaultValue={4}
             step={1}
             marks={{
               1: '1',
