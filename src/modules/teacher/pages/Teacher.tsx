@@ -58,11 +58,10 @@ export default function Teacher() {
   };
 
   const columns: TableColumnsType<TeacherEntity> = [
-    { title: 'Όνοματεπώνυμο', dataIndex: 'name', key: 'name' },
-    { title: 'Συντ/φια', dataIndex: 'short', key: 'short' },
-    { title: 'Ειδικότητα', dataIndex: 'specialty', key: 'specialty' },
-    { title: 'Χρώμα', dataIndex: 'color', key: 'color' },
-    { title: 'Συνεχόμενες Ώρες Διδασκαλίας', dataIndex: 'continuousTeachingHours', width: 150, key: 'continuousTeachingHours' },
+    { title: 'Όνοματεπώνυμο', dataIndex: 'name', key: 'name', align: 'center' },
+    { title: 'Συντ/φια', dataIndex: 'short', key: 'short', align: 'center' },
+    { title: 'Ειδικότητα', dataIndex: 'specialty', key: 'specialty', align: 'center' },
+    { title: 'Υποχρεωτικές Ώρες Διδασκαλίας', dataIndex: 'mandatoryTeachingHours', width: 130, key: 'mandatoryTeachingHours', align: 'center' },
     {
       title: 'Σύνολο Ωρών Διδασκαλίας',
       key: 'totalTeachingHours',
@@ -75,6 +74,7 @@ export default function Teacher() {
       title: 'Τροποποιήσεις',
       dataIndex: '',
       key: 'x',
+      align: 'center',
       render: () => renderActions(null, null as any, 0),
     },
   ];
@@ -136,6 +136,9 @@ export default function Teacher() {
                 </Space>
               </Descriptions.Item>
               <Descriptions.Item label="Συνεχόμενες Ώρες">{selectedTeacher.continuousTeachingHours}</Descriptions.Item>
+              <Descriptions.Item label="Υποχρεωτικές Ώρες Διδασκαλίας">
+                {selectedTeacher.mandatoryTeachingHours}
+              </Descriptions.Item>
               <Descriptions.Item label="Σύνολο Ωρών Διδασκαλίας">
                 {selectedTeacher.teachings.reduce((sum, t) => sum + t.totalHours, 0)}
               </Descriptions.Item>

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTable";
 import type { TeacherPost } from "../types";
+import { toast } from "react-toastify";
 
 const initialAvailability: number[][] = [
     [0, 0, 0, 0, 0, 0],
@@ -50,6 +51,13 @@ export default function AddEditTeacher({
     });
   }
 
+  const handleCancel = () => {
+    form.resetFields();
+    setAvailabilities(initialAvailability.map(row => [...row]));
+    setSelectedSpecialty(null);
+    modifyIsModalOpen(false);
+  };
+
   const handleOk = async () => {
       form.validateFields()
       .then(async (values) => {
@@ -64,18 +72,14 @@ export default function AddEditTeacher({
           specialtyId: selectedSpecialty || "",
           schoolUnitId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b",
         };
-        console.log("Data to submit:", dataToSubmit);
         await onSubmit(dataToSubmit);
-        form.resetFields();
-        setAvailabilities(initialAvailability.map(row => [...row]));
         form.resetFields();
         setAvailabilities(initialAvailability.map(row => [...row]));
         modifyIsModalOpen(false);
       })
-      .catch((info) => {
-        console.log("Validate Failed:", info);
+      .catch(() => {
+        toast.error("Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.");
       });
-      modifyIsModalOpen(false);
     };
 
  useEffect(() => {
@@ -97,7 +101,7 @@ export default function AddEditTeacher({
     <Modal
       //title={defaultEditValues ? "Edit Teacher" : "Add Teacher"}
       open={isModalOpen}
-      onCancel={() => modifyIsModalOpen(false)}
+      onCancel={handleCancel}
       onOk={handleOk}
     >
       <Form form={form} layout="vertical" >

@@ -8,8 +8,9 @@ export function useTeachers(requestData: any): TeacherEntity[] {
     short: teacher.short,
     color: teacher.color,
     continuousTeachingHours: teacher.continuousTeachingHours,
+    mandatoryTeachingHours: teacher.mandatoryTeachingHours,
     availabilities: teacher.availabilities,
-    teachings: teacher.teachings,
+    teachings: teacher.teachings ?? [],
     specialty: teacher.specialty,
   }));
 }
