@@ -1,52 +1,104 @@
-import { Button, Card, Col, Divider, Row, Space } from "antd";
-import { EditOutlined, SettingOutlined, PlusOutlined } from "@ant-design/icons";
+import { App, Button, Card, Col, Divider, Row, Space } from "antd";
+import { EditOutlined, PlusOutlined, DeleteFilled } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { GroupService } from "../../group/services/GroupServices";
-import type { GroupEntity } from "../../group/types";
-
-    
+import type { GroupEntity, GroupPost } from "../../group/types";
+import AddEditGroup from "../components/AddEditGroup";
 
 export default function Group() {
+    const { modal } = App.useApp();
     const [data, setData] = useState<GroupEntity[]>([]);
-    const actions: React.ReactNode[] = [
-        <EditOutlined key="edit" />,
-        <SettingOutlined key="setting" />,
-    ];
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState<GroupEntity | null>(null);
+    const [reload, setReload] = useState(false);
 
-      useEffect(() => {
-        const fetchData = async () => {
-          const response = await GroupService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
-          
-          setData(response.sort((a, b) => a.name.localeCompare(b.name)));
-        };
-        fetchData();
-      }, []);
+    const handleEdit = (group: GroupEntity) => {
+        setSelectedGroup(group);
+        setModalOpen(true);
+    }
+    
+    const handleDelete = async (group: GroupEntity) => {
+        modal.confirm({
+            title: "Επιβεβαίωση Διαγραφής",
+            content: "Είστε σίγουροι ότι θέλετε να διαγράψετε το συγκεκριμένο τμήμα;",
+            onOk: async () => {
+            try {
+                await GroupService.delete(group);
+                setReload((prev) => !prev);
+            } catch (error) {
+                console.error("Error deleting group:", error);
+            }
+            },
+        });
+    }
+
+    const handleSubmit = async (group: GroupPost) => {
+    try{
+        if(selectedGroup){
+            const groupToUpdate = { ...group, id: selectedGroup.key };
+            console.log("Updating group:", groupToUpdate);
+            await GroupService.update(groupToUpdate);
+            setReload((prev) => !prev);
+        }else{
+        let response = await GroupService.insert(group);
+        setData((prev) => [response!, ...prev ]); // Trigger re-render by updating state
+        }
+    } catch (error) {
+        console.error("Error submitting group:", error);
+    }
+    setModalOpen(false);
+    setSelectedGroup(null);
+    };
+
+    useEffect(() => {
+    const fetchData = async () => {
+        const response = await GroupService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+        
+        setData(response.sort((a, b) => a.name.localeCompare(b.name)));
+    };
+    fetchData();
+    }, [reload]);
 
     return (
         <>
-            <h2>Εκπαιδευτικοί</h2>
+            <h2>Τμήματα</h2>
             <Divider orientation="start" orientationMargin={0}></Divider>
             <Space style={{ marginBottom: 16 }}>
                 <Button
                     type="primary"
-                    // shape="round"
                     size="large"
                     icon={<PlusOutlined />}
                     style={{ fontSize: 16, padding: "0 16px" }}
-                    >
+                    onClick={() => setModalOpen(true)}
+                >
                     Προσθήκη
                 </Button>
             </Space>
             <Row gutter={[16, 16]}>
-                    {data.map((group) => (
+                    {data.map((group) => {
+                        const actions: React.ReactNode[] = [
+                            <EditOutlined key="edit" onClick={() => handleEdit(group)}/>,
+                            <DeleteFilled key="delete" onClick={() => handleDelete(group)}/>,
+                        ];
+                        
+                        return (
                         <Col key={group.key} span={8}>
-                            <Card title={group.name} actions={actions} type="inner" >
-                                Total Hours: {group.totalHours}
+                            <Card title={`Τμήμα ${group.name}`} 
+                                actions={actions} 
+                                type="inner" 
+                                >
+                                Σύνολο Ωρών Διδασκαλίας: {group.totalHours}
                             </Card>
                         </Col>
-                    ))}
+                        );
+                    })}
             </Row>
+            <AddEditGroup
+                isModalOpen={modalOpen}
+                modifyIsModalOpen={setModalOpen}
+                defaultEditValues={selectedGroup ?? undefined}
+                onSubmit={handleSubmit}
+            />
         </>
-        
     );
 }

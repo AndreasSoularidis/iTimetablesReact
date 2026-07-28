@@ -4,6 +4,24 @@ export interface GroupGet {
     totalHours: number;
     short: string;
     color: string;
+    schoolUnitId: string;
+}
+
+export interface GroupPost {
+    name: string;
+    totalHours: number;
+    short: string;
+    color: string;
+    schoolUnitId: string;
+}
+
+export interface GroupPut {
+    id: string;
+    name: string;
+    totalHours: number;
+    short: string;
+    color: string;
+    schoolUnitId: string;
 }
 
 export interface GroupEntity {
@@ -12,4 +30,5 @@ export interface GroupEntity {
     totalHours: number;
     short?: string;
     color?: string;
+    schoolUnitId: string;
 }

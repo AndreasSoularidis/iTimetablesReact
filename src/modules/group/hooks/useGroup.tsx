@@ -8,5 +8,17 @@ export function useGroups(requestData: any): GroupEntity[] {
     totalHours: group.totalHours,
     short: group.short,
     color: group.color,
+    schoolUnitId: group.schoolUnitId,
   }));
+}
+
+export function useGroup(group: any): GroupEntity {
+  return {
+    key: group.id,
+    name: group.name,
+    totalHours: group.totalHours,
+    short: group.short,
+    color: group.color,
+    schoolUnitId: group.schoolUnitId,
+  };
 }
