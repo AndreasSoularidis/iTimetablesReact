@@ -1,4 +1,4 @@
-import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag } from "antd";
+import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, App } from "antd";
 import { PlusOutlined, DeleteFilled, EditFilled  } from "@ant-design/icons";
 import type { TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
@@ -9,14 +9,16 @@ import AddEditTeacher from "../components/AddEditTeacher";
 import type { TeacherPost } from "../types";
 
 export default function Teacher() {
+  const { modal } = App.useApp();
   const [data, setData] = useState<TeacherEntity[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherEntity | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [reload, setReload] = useState(false);
   const showDrawer = () => {
     setDrawerOpen(true);
   }
-
+  
   const onClose = () => {
     setDrawerOpen(false);
   }
@@ -27,20 +29,36 @@ export default function Teacher() {
   }
 
   const handleDelete = async (teacher: TeacherEntity) => {
-    setDrawerOpen(false);
-    console.log("Delete clicked for record:", teacher);
+    modal.confirm({
+      title: "Επιβεβαίωση Διαγραφής",
+      content: "Είστε σίγουροι ότι θέλετε να διαγράψετε τον εκπαιδευτικό;",
+      onOk: async () => {
+        try {
+          await TeacherService.delete(teacher);
+          setReload((prev) => !prev);
+        } catch (error) {
+          console.error("Error deleting teacher:", error);
+        }
+      },
+    });
   }
 
 
   const handleSubmit = async (teacher: TeacherPost) => {
     try{
+      if(selectedTeacher){
+        const teacherToUpdate = { ...teacher, id: selectedTeacher.key };
+        console.log("Updating teacher:", teacherToUpdate);
+        await TeacherService.update(teacherToUpdate);
+      }else{
         await TeacherService.insert(teacher);
-        const response = await TeacherService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
-        setData(response);
+      }
+      setReload((prev) => !prev);
     } catch (error) {
       console.error("Error submitting teacher:", error);
     }
     setModalOpen(false);
+    setSelectedTeacher(null);
   };
 
   const renderActions = (value: any, record: TeacherEntity, index: number) => {
@@ -49,7 +67,7 @@ export default function Teacher() {
         <Tooltip placement="topLeft" title="Επεξεργασία">
           <Button
             type="default"
-            onClick={(e) => { e.stopPropagation(); handleEdit(record); }}
+            onClick={(e) => {e.stopPropagation(); handleEdit(record); }}
           >
             <EditFilled />
           </Button>
@@ -84,7 +102,7 @@ export default function Teacher() {
       dataIndex: '',
       key: 'x',
       align: 'center',
-      render: () => renderActions(null, null as any, 0),
+      render: (_: any, record: TeacherEntity) => renderActions(null, record, 0),
     },
   ];
 
@@ -94,7 +112,7 @@ export default function Teacher() {
       setData(response);
     };
     fetchData();
-  }, []);
+  }, [reload]);
 
 
   return (
@@ -120,7 +138,6 @@ export default function Teacher() {
         onRow={(record) => ({
           onClick: () => {
             setSelectedTeacher(record);
-            console.log("Selected Teacher:", record);
             showDrawer();
           },
           style: { cursor: "pointer" },
@@ -181,7 +198,7 @@ export default function Teacher() {
       <AddEditTeacher
         isModalOpen={modalOpen}
         modifyIsModalOpen={setModalOpen}
-        // defaultEditValues={selectedTeacher ?? null}
+        defaultEditValues={selectedTeacher ? selectedTeacher : undefined}
         onSubmit={handleSubmit}
       />
     </>

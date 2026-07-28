@@ -9,9 +9,23 @@ export interface TeacherGet {
     availabilities: number[];
     teachings?: Teachings[];
     specialty: string;
+    schoolUnitId: string;
 }
 
 export interface TeacherPost {
+    firstName: string;
+    lastName: string;
+    short: string;
+    mandatoryTeachingHours: number;
+    color: string;
+    continuousTeachingHours: number;
+    availabilities: number[];
+    specialtyId: string;
+    schoolUnitId: string;
+}
+
+export interface TeacherPut {
+    id: string;
     firstName: string;
     lastName: string;
     short: string;
@@ -51,4 +65,5 @@ export interface TeacherEntity {
     availabilities: number[];
     teachings: Teachings[];
     specialty: string;
+    schoolUnitId: string;
 }

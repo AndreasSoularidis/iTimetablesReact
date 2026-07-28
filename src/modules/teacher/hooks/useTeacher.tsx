@@ -12,5 +12,6 @@ export function useTeachers(requestData: any): TeacherEntity[] {
     availabilities: teacher.availabilities,
     teachings: teacher.teachings ?? [],
     specialty: teacher.specialty,
+    schoolUnitId: teacher.schoolUnitId,
   }));
 }

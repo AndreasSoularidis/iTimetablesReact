@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTable";
-import type { TeacherPost } from "../types";
+import type { TeacherEntity, TeacherPost, Specialty } from "../types";
 import { toast } from "react-toastify";
 
 const initialAvailability: number[][] = [
@@ -24,17 +24,17 @@ const initialAvailability: number[][] = [
 interface IProps {
   isModalOpen: boolean;
   modifyIsModalOpen: (value: boolean) => void;
-  // defaultEditValues: TeacherGet | null;
+  defaultEditValues: TeacherEntity | undefined;
   onSubmit: (teacher: TeacherPost) => Promise<void>;
 }
 
 export default function AddEditTeacher({
   isModalOpen,
   modifyIsModalOpen,
-  // defaultEditValues,
+  defaultEditValues,
   onSubmit,
 }: IProps) {
-  const [specialties, setSpecialties] = useState<{ id: string; code: string; title: string }[]>([]);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [availabilities, setAvailabilities] = useState<number[][]>(() =>
     initialAvailability.map(row => [...row])
   );
@@ -51,6 +51,11 @@ export default function AddEditTeacher({
     });
   }
 
+  const to2D = (flat: number[], cols = 6): number[][] =>
+    Array.from({ length: flat.length / cols }, (_, i) =>
+    flat.slice(i * cols, i * cols + cols)
+  );
+
   const handleCancel = () => {
     form.resetFields();
     setAvailabilities(initialAvailability.map(row => [...row]));
@@ -59,30 +64,49 @@ export default function AddEditTeacher({
   };
 
   const handleOk = async () => {
-      form.validateFields()
-      .then(async (values) => {
-        const dataToSubmit: TeacherPost = {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          short: `${values.firstName.charAt(0)}${values.lastName.charAt(0)}`,
-          mandatoryTeachingHours: values.mandatoryTeachingHours,
-          color: values.color,
-          continuousTeachingHours: values.maxTeachingHours,
-          availabilities: availabilities.flat(),
-          specialtyId: selectedSpecialty || "",
-          schoolUnitId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b",
-        };
-        await onSubmit(dataToSubmit);
-        form.resetFields();
-        setAvailabilities(initialAvailability.map(row => [...row]));
-        modifyIsModalOpen(false);
-      })
-      .catch(() => {
-        toast.error("Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.");
-      });
-    };
+    form.validateFields()
+    .then(async (values) => {
+      const dataToSubmit: TeacherPost = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        short: `${values.firstName.charAt(0)}${values.lastName.charAt(0)}`,
+        mandatoryTeachingHours: values.mandatoryTeachingHours,
+        color: values.color,
+        continuousTeachingHours: values.maxTeachingHours,
+        availabilities: availabilities.flat(),
+        specialtyId: selectedSpecialty || "",
+        schoolUnitId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b",
+      };
+      await onSubmit(dataToSubmit);
+      form.resetFields();
+      setAvailabilities(initialAvailability.map(row => [...row]));
+      modifyIsModalOpen(false);
+    })
+    .catch(() => {
+      toast.error("Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.");
+    });
+  };
 
- useEffect(() => {
+  const matchSpecialty = (specialtyCode: string) => {
+    const specialty = specialties.find(s => s.code === specialtyCode);
+    setSelectedSpecialty(specialty ? specialty.id : null);
+    return specialty ? `${specialty.code} - ${specialty.title}` : "";
+  }
+
+  useEffect(() => {
+    if(defaultEditValues) {
+      console.log("Setting form values for editing:", defaultEditValues);
+        form.setFieldsValue({
+            firstName: defaultEditValues.name.split(" ")[0],
+            lastName: defaultEditValues.name.split(" ")[1] || "",
+            mandatoryTeachingHours: defaultEditValues.mandatoryTeachingHours,
+            maxTeachingHours: defaultEditValues.continuousTeachingHours,
+            color: defaultEditValues.color,
+            specialty: matchSpecialty(defaultEditValues.specialty),
+        });
+      setAvailabilities(to2D(defaultEditValues.availabilities));  
+    }
+
     async function fetchTeacherSpecialties() {
       try {
         const response = await axios.get("http://localhost:5191/api/specialties");
@@ -95,11 +119,11 @@ export default function AddEditTeacher({
       }
     }
     fetchTeacherSpecialties();
-  }, []);
+  }, [defaultEditValues, form, isModalOpen]);
 
   return (
     <Modal
-      //title={defaultEditValues ? "Edit Teacher" : "Add Teacher"}
+      title={defaultEditValues ? "Επεξεργασία Εκπαιδευτικού" : "Προσθήκη Εκπαιδευτικού"}
       open={isModalOpen}
       onCancel={handleCancel}
       onOk={handleOk}
