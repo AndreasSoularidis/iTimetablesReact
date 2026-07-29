@@ -4,10 +4,12 @@ import {
   Input,
   InputNumber,
   Modal,
+  Select,
 } from "antd";
-import { useEffect } from "react";
-import type { GroupEntity, GroupPost } from "../types";
+import { useEffect, useState } from "react";
+import type { GroupEntity, GroupPost, LookUp } from "../types";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const SCHOOL_UNIT_ID = "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b";
 
@@ -25,6 +27,8 @@ export default function AddEditGroup({
   onSubmit,
 }: IProps) 
 {
+  const [grades, setGrades] = useState<LookUp[]>([]);
+  const [selectedGrade, setSelectedGrade] = useState<string>("");
   const [form] = Form.useForm();
 
   const handleCancel = () => {
@@ -40,6 +44,7 @@ export default function AddEditGroup({
         totalHours: values.totalHours,
         short: values.name,
         color: values.color,
+        gradeId: selectedGrade,
         schoolUnitId: SCHOOL_UNIT_ID,
       };
       await onSubmit(dataToSubmit);
@@ -51,15 +56,36 @@ export default function AddEditGroup({
     });
   };
 
+  const matchGrade = (gradeCode: string) => {
+    const grade = grades.find(g => g.id === gradeCode);
+    setSelectedGrade(grade ? grade.id : "");
+    return grade ? grade.description : "";
+  }
+
   useEffect(() => {
     if(defaultEditValues) {
       console.log("Setting form values for editing:", defaultEditValues);
         form.setFieldsValue({
             name: defaultEditValues.name,
             totalHours: defaultEditValues.totalHours,
+            grade: matchGrade(defaultEditValues.grade.id),
             color: defaultEditValues.color,
         });
     }
+
+    async function fetchGrades() {
+      try {
+        const response = await axios.get("http://localhost:5191/api/schoolgrades");
+        const data  = response.data.schoolGrades
+        .sort((a: { id: string; description: string, schoolTypeId: string }, b: { id: string; description: string, schoolTypeId: string }) =>
+              a.description.localeCompare(b.description));;
+        setGrades(data);
+      } catch (error) {
+        console.error("Error fetching grades:", error);
+      }
+    }
+    fetchGrades();
+    
   }, [defaultEditValues, form, isModalOpen]);
 
   return (
@@ -76,6 +102,24 @@ export default function AddEditGroup({
           rules={[{ required: true, message: "Παρακαλώ εισάγετε το όνομα του τμήματος!" }]}
         >
           <Input />
+        </Form.Item>
+        <Form.Item
+          name="grade"
+          label="Τάξη"
+          rules={[{ required: true, message: "Παρακαλώ επιλέξτε την τάξη!" }]}
+        >
+          <Select
+          options={grades.map((grade) => ({
+            key: grade.id,
+            value: grade.id,
+            label: grade.description,
+          }))}
+          placeholder="Επιλέξτε τάξη"
+          onChange={(value) => {
+            form.setFieldsValue({ grade: value });
+            setSelectedGrade(value);
+          }}
+        />
         </Form.Item>
         <Form.Item style={{ marginBottom: 0 }}>
           <Form.Item

@@ -87,7 +87,8 @@ export default function Group() {
                                 actions={actions} 
                                 type="inner" 
                                 >
-                                Σύνολο Ωρών Διδασκαλίας: {group.totalHours}
+                                <p>Σύνολο Ωρών Διδασκαλίας: {group.totalHours}</p>
+                                <p>Τάξη: {group.grade.description}</p>
                             </Card>
                         </Col>
                         );
