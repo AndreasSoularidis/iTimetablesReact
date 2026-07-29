@@ -41,3 +41,32 @@ export interface GroupEntity {
     grade: LookUp;
     schoolUnitId: string;
 }
+
+export interface Courses{
+    id: string;
+    title: string;
+    short: string;
+    grade: Grade;
+}
+
+export interface Grade{
+    id: string;
+    description: string;
+    hoursPerWeek: number;
+}
+
+export interface TeachingPost{
+    schoolClassId: string;
+    teacherId: string;
+    courseId: string;
+    totalHours: number;
+    dispersion: number[];
+}
+
+export interface TeachingEntity{
+    key: string;
+    teacher: LookUp;
+    course: LookUp;
+    totalHours: number;
+    dispersion: number[];
+}
