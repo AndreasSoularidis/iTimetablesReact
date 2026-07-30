@@ -1,41 +1,30 @@
-import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, Row, Col, Card } from "antd";
+import { Space, Table, Divider, Drawer, Descriptions, Tag, Row, Col, Card, Button } from "antd";
 import { PlusOutlined, DeleteFilled, EditFilled, EditOutlined, PlusCircleOutlined, EyeFilled } from "@ant-design/icons";
+import AddEditTeaching from "../components/AddEditTeaching";
 import { useEffect, useState } from "react";
-import type { TeachingEntity } from "../types";
+import type { TeachingEntity, TeachingPost } from "../types";
 import { TeachingService } from "../services/TeachingService";
 
 export default function Teaching() {
   const [data, setData] = useState<TeachingEntity[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTeaching, setSelectedTeaching] = useState<TeachingEntity | null>(null);
 
-  const renderActions = (value: any, record: TeachingEntity, index: number) => {
-    return (
-      <Space>
-        <Tooltip placement="topLeft" title="Επεξεργασία">
-          <Button
-            type="default"
-            // onClick={() => handleEdit(record)}
-          >
-            <EditFilled />
-          </Button>
-        </Tooltip>
-        <Tooltip placement="topLeft" title="Διαγραφή">
-          <Button
-            // onClick={() => handleDelete(record)}
-            danger
-          >
-            <DeleteFilled />
-          </Button>
-        </Tooltip>
-      </Space>
-    );
+  const handleTeachingSubmit = async (teaching: TeachingPost) => {
+    try{
+      await TeachingService.insert(teaching);
+      // setReload((prev) => !prev);
+    } catch (error) {
+      console.error("Error submitting teaching:", error);
+    }
+    setIsModalOpen(false);
+    setSelectedTeaching(null);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await TeachingService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
-      console.log("Fetched teachings data in Teaching.tsx:", response);
       setData(response);
     };
     fetchData();
@@ -46,6 +35,17 @@ export default function Teaching() {
     <>
       <h2>Διδασκαλίες</h2>
       <Divider orientation="start" orientationMargin={0}></Divider>
+      <Space style={{ marginBottom: 16 }}>
+        <Button
+            type="primary"
+            size="large"
+            icon={<PlusOutlined />}
+            style={{ fontSize: 16, padding: "0 16px" }}
+            onClick={() => setIsModalOpen(true)}
+        >
+            Προσθήκη
+        </Button>
+    </Space>
       <Row gutter={[16, 16]}>
         {data.map((group) => {
           const actions: React.ReactNode[] = [
@@ -54,7 +54,7 @@ export default function Teaching() {
               // <PlusCircleOutlined key="addTeaching" onClick={() => handleAddTeaching(group)}/>
               <EyeFilled key="show" onClick={() => { setDrawerOpen(true); setSelectedTeaching(group); }} />,
               <DeleteFilled key="delete" />,
-              <PlusCircleOutlined key="addTeaching" />
+              <PlusCircleOutlined key="addTeaching" onClick={() => { setIsModalOpen(true); setSelectedTeaching(group); }} />
           ];
           
           return (
@@ -108,6 +108,12 @@ export default function Teaching() {
           </>
         )}
       </Drawer>
+      <AddEditTeaching
+          isModalOpen={isModalOpen}
+          modifyIsModalOpen={setIsModalOpen}
+          defaultValues={selectedTeaching!}
+          onSubmit={handleTeachingSubmit}
+        />
     </>
   );
-}
+}           

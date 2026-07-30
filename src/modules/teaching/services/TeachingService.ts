@@ -1,7 +1,9 @@
 import axios from "axios";
-import type { TeachingEntity, TeachingsGet } from "../types";
+import type { TeachingEntity, TeachingPost, TeachingsGet } from "../types";
 import { toast } from "react-toastify";
 import { useTeachings } from "../hooks/useTeaching";
+
+const SCHOOL_ID = "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b";
 
 async function getTeachings(schoolId: string): Promise<Array<TeachingEntity>> {
   try {
@@ -17,6 +19,22 @@ async function getTeachings(schoolId: string): Promise<Array<TeachingEntity>> {
   }
 }
 
+async function insertTeaching(data: TeachingPost) {
+  try {
+    await axios.post(`http://localhost:5191/api/schools/${SCHOOL_ID}/teachings`, data);
+    toast.success(
+      "Τα στοιχεία αποθηκεύτηκαν με επιτυχία!"
+    );
+    console.log("Data submitted", data);
+  } catch (error) {
+    toast.error(
+      "Σφάλμα κατά την αποθήκευση των στοιχείων."
+    );
+    console.error("Error adding/editing teaching:", error);
+  }
+}
+
 export const TeachingService = {
   load: getTeachings,
+  insert: insertTeaching,
 };

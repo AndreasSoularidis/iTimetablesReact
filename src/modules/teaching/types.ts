@@ -26,7 +26,7 @@ export interface TeachingEntity {
     key: string;
     schoolUnitId: string;
     name: string;
-    gradeId: string;
+    grade: LookUp;
     teachingHours: number;
     assignedTeachingHours: number;
     teachings?: TeachingDetails[];
@@ -39,15 +39,14 @@ export interface TeachingPost{
     dispersion: number[];
 }
 
-// export interface GroupEntity {
-//     key: string;
-//     name: string;
-//     totalHours: number;
-//     short?: string;
-//     color?: string;
-//     grade: LookUp;
-//     schoolUnitId: string;
-// }
+export interface SchoolClassEntity {
+    id: string;
+    name: string;
+    totalHours: number;
+    short: string;
+    grade: LookUp;
+    schoolUnitId: string;
+}
 
 export interface Course{
     id: string;
