@@ -6,6 +6,7 @@ export function useTeachings(requestData: any): TeachingEntity[] {
     .map((teaching: TeachingsGet, index: number) => ({
       key: `teaching-${index}`,
       name: teaching.schoolClass.name,
+      gradeId: teaching.schoolClass.grade.id,
       teachingHours: teaching.schoolClass.teachingHours,
       assignedTeachingHours: teaching.teachings?.reduce((sum, t) => sum + t.totalHours, 0) || 0,
       teachings: teaching.teachings,
