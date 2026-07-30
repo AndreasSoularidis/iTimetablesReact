@@ -8,7 +8,7 @@ async function getTeachings(schoolId: string): Promise<Array<TeachingEntity>> {
     const response = await axios.get<Array<TeachingsGet>>(
       `http://localhost:5191/api/schools/${schoolId}/teachings`
     );
-
+    console.log("Fetched teachings data:", response.data);
     return useTeachings(response.data);
   } catch (error) {
     console.error(error);
