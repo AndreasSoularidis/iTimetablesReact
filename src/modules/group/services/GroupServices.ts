@@ -1,9 +1,9 @@
 import axios from "axios";
-import type { GroupEntity, GroupGet, GroupPost, GroupPut } from "../types";
+import type { GroupEntity, GroupGet, GroupPost, GroupPut, TeachingPost } from "../types";
 import { toast } from "react-toastify";
 import { useGroup, useGroups } from "../hooks/useGroup";
 
-
+const SCHOOL_ID = "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b";
 
 async function getGroups(schoolId: string): Promise<Array<GroupEntity>> {
   try {
@@ -58,9 +58,25 @@ async function deleteGroup(group: GroupEntity) {
   }
 }
 
+async function insertTeaching(data: TeachingPost) {
+  try {
+    await axios.post(`http://localhost:5191/api/schools/${SCHOOL_ID}/teachings`, data);
+    toast.success(
+      "Τα στοιχεία αποθηκεύτηκαν με επιτυχία!"
+    );
+    console.log("Data submitted", data);
+  } catch (error) {
+    toast.error(
+      "Σφάλμα κατά την αποθήκευση των στοιχείων."
+    );
+    console.error("Error adding/editing teaching:", error);
+  }
+}
+
 export const GroupService = {
   load: getGroups,
   insert: insertGroup,
   update: updateGroup,
   delete: deleteGroup,
+  insertTeaching: insertTeaching,
 };

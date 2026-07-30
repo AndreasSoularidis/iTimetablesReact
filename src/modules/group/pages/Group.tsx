@@ -2,7 +2,7 @@ import { App, Button, Card, Col, Divider, Row, Space } from "antd";
 import { EditOutlined, PlusOutlined, DeleteFilled, PlusCircleOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { GroupService } from "../../group/services/GroupServices";
-import type { GroupEntity, GroupPost } from "../../group/types";
+import type { GroupEntity, GroupPost, TeachingPost } from "../../group/types";
 import AddEditGroup from "../components/AddEditGroup";
 import AddEditTeaching from "../components/AddEditTeaching";
 
@@ -56,6 +56,17 @@ export default function Group() {
     }
     setModalOpen(false);
     setSelectedGroup(null);
+    };
+
+    const handleTeachingSubmit = async (teaching: TeachingPost) => {
+    try{
+        await GroupService.insertTeaching(teaching);
+        // setReload((prev) => !prev);
+    } catch (error) {
+        console.error("Error submitting teaching:", error);
+    }
+    // setTeachingModalOpen(false);
+    // setSelectedGroup(null);
     };
 
     useEffect(() => {
@@ -113,7 +124,7 @@ export default function Group() {
                 isModalOpen={teachingModalOpen}
                 modifyIsModalOpen={setTeachingModalOpen}
                 schoolClass={selectedGroup ?? undefined}
-                onSubmit={handleSubmit}
+                onSubmit={handleTeachingSubmit}
             />
         </>
     );
