@@ -27,7 +27,7 @@ interface IProps {
   isModalOpen: boolean;
   modifyIsModalOpen: (value: boolean) => void;
   defaultValues: TeachingEntity | null;
-  onSubmit: (teaching: TeachingPost) => Promise<void>;
+  onSubmit: () => void;
 }
 
 export default function AddEditTeaching({
@@ -59,11 +59,6 @@ export default function AddEditTeaching({
     setSelectedSchoolClass(null);
     setTeachings([]);
     setClassTotalHours(0);
-  };
-
-  const handleOk = () => {
-    form.resetFields();
-    modifyIsModalOpen(false);
   };
 
   const handleDelete = async (teaching: Teaching) => {
@@ -101,7 +96,6 @@ export default function AddEditTeaching({
   };
 
   const handleAddTeaching = async () => {
-    const schoolClass = selectedSchoolClass;
     const teacher = teachers.find(t => t.key === selectedTeacher);
     const course = courses.find(c => c.id === selectedCourse);
     const assignedHours = form.getFieldValue("assignedHours");
@@ -143,24 +137,6 @@ export default function AddEditTeaching({
       return;
     }
 
-    const newTeaching: Teaching= {
-      key: `${selectedTeacher}-${selectedCourse}`,
-      teacher: { id: selectedTeacher, description: teacher?.name || "" },
-      course: { id: selectedCourse, description: course?.title || "" },
-      totalHours: assignedHours,
-      dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0], 
-    };
-
-    setTeachings([...teachings, newTeaching]);
-    setCoursesRemainingHours(prev => prev.map(c => c.id === selectedCourse ? { ...c, remainingHours: c.remainingHours - newTeaching.totalHours } : c));
-    setTeachersRemainingHours(prev => prev.map(t => t.id === selectedTeacher ? { ...t, remainingHours: t.remainingHours - newTeaching.totalHours } : t));
-    const updatedTeacherRemainingHours = (teachersRemainingHours.find(t => t.id === selectedTeacher)?.remainingHours ?? 0) - newTeaching.totalHours;
-    setClassTotalHours(prev => prev + newTeaching.totalHours);
-    form.setFieldsValue({ teacherRemainingHours: updatedTeacherRemainingHours });
-    form.resetFields(["course", "teacher", "assignedHours", "oneHourCount", "twoHourCount", "teacherRemainingHours"]);
-    if(course?.grade?.hoursPerWeek === 0){
-      setCourses(prev => prev.filter(c => c.id !== selectedCourse));
-    }
     const dataToSubmit: TeachingPost = {
       schoolClassId: selectedSchoolClass?.id || "",
       teacherId: selectedTeacher,
@@ -169,33 +145,31 @@ export default function AddEditTeaching({
       dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0],
     };
     try {
-      console.log("Submitting data", dataToSubmit);
-      await onSubmit(dataToSubmit);
-      form.resetFields();
+      const response = await TeachingService.insert(dataToSubmit);
+
+      const newTeaching: Teaching= {
+        key: `${response?.teacher.id}-${response?.course.id}`,
+        teacher: { id: response?.teacher.id!, description: teacher?.name!},
+        course: { id: response?.course.id!, description: course?.title! },
+        totalHours: assignedHours,
+        dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0], 
+      };
+
+      setTeachings([...teachings, newTeaching ]);
+      setCoursesRemainingHours(prev => prev.map(c => c.id === selectedCourse ? { ...c, remainingHours: c.remainingHours - newTeaching.totalHours } : c));
+      setTeachersRemainingHours(prev => prev.map(t => t.id === selectedTeacher ? { ...t, remainingHours: t.remainingHours - newTeaching.totalHours } : t));
+      const updatedTeacherRemainingHours = (teachersRemainingHours.find(t => t.id === selectedTeacher)?.remainingHours ?? 0) - newTeaching.totalHours;
+      setClassTotalHours(prev => prev + newTeaching.totalHours);
+      form.setFieldsValue({ teacherRemainingHours: updatedTeacherRemainingHours });
+      form.resetFields(["course", "teacher", "assignedHours", "oneHourCount", "twoHourCount", "teacherRemainingHours"]);
+      if(course?.grade?.hoursPerWeek === 0){
+        setCourses(prev => prev.filter(c => c.id !== selectedCourse));
+      }
     } catch {
       toast.error("Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.");
     }
   };
 
-  // const handleOk = async () => {
-  //   form.validateFields()
-  //   .then(async (values) => {
-  //     const dataToSubmit: TeachingPost = {
-  //       name: values.name,
-  //       totalHours: values.totalHours,
-  //       short: values.name,
-  //       color: values.color,
-  //       gradeId: selectedGrade,
-  //       schoolUnitId: SCHOOL_UNIT_ID,
-  //     };
-  //     await onSubmit(dataToSubmit);
-  //     form.resetFields();
-  //     modifyIsModalOpen(false);
-  //   })
-  //   .catch(() => {
-  //     toast.error("Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.");
-  //   });
-  // };
 
   useEffect(() => {
 
@@ -290,7 +264,7 @@ export default function AddEditTeaching({
       title={defaultValues ? `Διδασκαλίες ${defaultValues?.name}` : "Νέες Διδασκαλίες"}
       open={isModalOpen}
       onCancel={handleCancel}
-      onOk={handleOk}
+      onOk={onSubmit}
       width={700}
     >
       {defaultValues && (

@@ -7,19 +7,15 @@ import { TeachingService } from "../services/TeachingService";
 
 export default function Teaching() {
   const [data, setData] = useState<TeachingEntity[]>([]);
+  const [reloadData, setReloadData] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTeaching, setSelectedTeaching] = useState<TeachingEntity | null>(null);
 
-  const handleTeachingSubmit = async (teaching: TeachingPost) => {
-    try{
-      await TeachingService.insert(teaching);
-      // setReload((prev) => !prev);
-    } catch (error) {
-      console.error("Error submitting teaching:", error);
-    }
+  const handleTeachingSubmit = () => {
     setIsModalOpen(false);
     setSelectedTeaching(null);
+    setReloadData(true);
   };
 
   useEffect(() => {
@@ -28,7 +24,7 @@ export default function Teaching() {
       setData(response);
     };
     fetchData();
-  }, []);
+  }, [reloadData]);
 
 
   return (

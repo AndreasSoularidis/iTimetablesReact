@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Course, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
+import type { Course, TeachingDetails, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
 import { toast } from "react-toastify";
 import { useTeachings } from "../hooks/useTeaching";
 
@@ -18,12 +18,13 @@ async function getTeachings(schoolId: string): Promise<Array<TeachingEntity>> {
   }
 }
 
-async function insertTeaching(data: TeachingPost) {
+async function insertTeaching(data: TeachingPost): Promise<TeachingDetails | undefined> {
   try {
-    await axios.post(`http://localhost:5191/api/schools/${SCHOOL_ID}/teachings`, data);
+    const response = await axios.post(`http://localhost:5191/api/schools/${SCHOOL_ID}/teachings`, data);
     toast.success(
       "Τα στοιχεία αποθηκεύτηκαν με επιτυχία!"
     );
+    return response.data;
   } catch (error) {
     toast.error(
       "Σφάλμα κατά την αποθήκευση των στοιχείων."
