@@ -41,7 +41,7 @@ export default function Teaching() {
             size="large"
             icon={<PlusOutlined />}
             style={{ fontSize: 16, padding: "0 16px" }}
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => { setIsModalOpen(true); setSelectedTeaching(null); }}
         >
             Προσθήκη
         </Button>

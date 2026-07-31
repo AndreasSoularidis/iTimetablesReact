@@ -16,11 +16,12 @@ import {
 } from "antd";
 import { DeleteFilled  } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import type { Course, SchoolClassEntity, TeachingEntity, TeachingPost } from "../types";
+import type { Course, SchoolClassEntity, Teaching, TeachingEntity, TeachingPost } from "../types";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { TeacherService } from "../../teacher/services/TeacherService";
 import type { TeacherEntity } from "../../teacher/types";
+import { TeachingService } from "../services/TeachingService";
 
 interface IProps {
   isModalOpen: boolean;
@@ -39,10 +40,12 @@ export default function AddEditTeaching({
   const [teachers, setTeachers] = useState<TeacherEntity[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<string>("");
   const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string>("");
-  const [teachings, setTeachings] = useState<TeachingEntity | null>(null);
+  const [teachings, setTeachings] = useState<Teaching[]>([]);
   const [classTotalHours, setClassTotalHours] = useState<number>( 0);
   const [schoolClasses, setSchoolClasses] = useState<SchoolClassEntity[] >([]);
+  const [selectedSchoolClass, setSelectedSchoolClass] = useState<{id: string, name: string, gradeId: string} | null>(null);
   const [teacherAssignedHours, setTeacherAssignedHours] = useState<number>(0);
 
   const [form] = Form.useForm();
@@ -53,6 +56,9 @@ export default function AddEditTeaching({
   const handleCancel = () => {
     form.resetFields();
     modifyIsModalOpen(false);
+    setSelectedSchoolClass(null);
+    setTeachings([]);
+    setClassTotalHours(0);
   };
 
   const handleOk = () => {
@@ -60,15 +66,25 @@ export default function AddEditTeaching({
     modifyIsModalOpen(false);
   };
 
-  const handleDelete = async (teaching: TeachingEntity) => {
-    // setTeachings(prevTeachings => prevTeachings.filter(t => t.key !== teaching.key));
-    // setCoursesRemainingHours(prev => prev.map(c => c.id === teaching.course.id ? { ...c, remainingHours: c.remainingHours + teaching.totalHours } : c));
-    // setTeachersRemainingHours(prev => prev.map(t => t.id === teaching.teacher.id ? { ...t, remainingHours: t.remainingHours + teaching.totalHours } : t));
-    // setClassTotalHours(prev => prev - teaching.totalHours);
-    // if (teaching.teacher.id === selectedTeacher) {
-    //   const updatedRemaining = (teachersRemainingHours.find(t => t.id === teaching.teacher.id)?.remainingHours ?? 0) + teaching.totalHours;
-    //   form.setFieldsValue({ teacherRemainingHours: updatedRemaining });
-    // }
+  const handleDelete = async (teaching: Teaching) => {
+    setTeachings(prevTeachings => prevTeachings.filter(t => t.key !== teaching.key));
+    setCoursesRemainingHours(prev => prev.map(c => c.id === teaching.course.id ? { ...c, remainingHours: c.remainingHours + teaching.totalHours } : c));
+    setTeachersRemainingHours(prev => prev.map(t => t.id === teaching.teacher.id ? { ...t, remainingHours: t.remainingHours + teaching.totalHours } : t));
+    setClassTotalHours(prev => prev - teaching.totalHours);
+    if (teaching.teacher.id === selectedTeacher) {
+      const updatedRemaining = (teachersRemainingHours.find(t => t.id === teaching.teacher.id)?.remainingHours ?? 0) + teaching.totalHours;
+      form.setFieldsValue({ teacherRemainingHours: updatedRemaining });
+    }
+  };
+
+  const handleSchoolClassChange = (value: string) => {
+    const selectedClass = schoolClasses.find(c => c.id === value);
+    setSelectedSchoolClass(selectedClass ? { id: selectedClass.id, name: selectedClass.name, gradeId: selectedClass.grade.id } : null);
+    form.setFieldsValue({ schoolClass: value });
+    const gradeCouses = courses.filter(c => c.grade.id === selectedClass?.grade.id);
+    setSelectedCourses(gradeCouses);
+    // setSelectedCourse("");
+    // form.setFieldsValue({ course: undefined, assignedHours: undefined, oneHourCount: undefined, twoHourCount: undefined });
   };
 
   const handleTeacherChange = (value: string) => {
@@ -85,6 +101,7 @@ export default function AddEditTeaching({
   };
 
   const handleAddTeaching = async () => {
+    const schoolClass = selectedSchoolClass;
     const teacher = teachers.find(t => t.key === selectedTeacher);
     const course = courses.find(c => c.id === selectedCourse);
     const assignedHours = form.getFieldValue("assignedHours");
@@ -126,12 +143,12 @@ export default function AddEditTeaching({
       return;
     }
 
-    const newTeaching: TeachingEntity = {
-        key: `${selectedTeacher}-${selectedCourse}`,
-        teacher: { id: selectedTeacher, description: teacher?.name || "" },
-        course: { id: selectedCourse, description: course?.title || "" },
-        totalHours: assignedHours,
-        dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0], 
+    const newTeaching: Teaching= {
+      key: `${selectedTeacher}-${selectedCourse}`,
+      teacher: { id: selectedTeacher, description: teacher?.name || "" },
+      course: { id: selectedCourse, description: course?.title || "" },
+      totalHours: assignedHours,
+      dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0], 
     };
 
     setTeachings([...teachings, newTeaching]);
@@ -140,25 +157,24 @@ export default function AddEditTeaching({
     const updatedTeacherRemainingHours = (teachersRemainingHours.find(t => t.id === selectedTeacher)?.remainingHours ?? 0) - newTeaching.totalHours;
     setClassTotalHours(prev => prev + newTeaching.totalHours);
     form.setFieldsValue({ teacherRemainingHours: updatedTeacherRemainingHours });
-    // form.resetFields(["course", "teacher", "assignedHours", "oneHourCount", "twoHourCount", "teacherRemainingHours"]);
+    form.resetFields(["course", "teacher", "assignedHours", "oneHourCount", "twoHourCount", "teacherRemainingHours"]);
     if(course?.grade?.hoursPerWeek === 0){
       setCourses(prev => prev.filter(c => c.id !== selectedCourse));
     }
     const dataToSubmit: TeachingPost = {
-      schoolClassId: schoolClass.key,
+      schoolClassId: selectedSchoolClass?.id || "",
       teacherId: selectedTeacher,
       courseId: selectedCourse,
       totalHours: assignedHours,
       dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0],
     };
     try {
+      console.log("Submitting data", dataToSubmit);
       await onSubmit(dataToSubmit);
       form.resetFields();
     } catch {
       toast.error("Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.");
     }
-
-
   };
 
   // const handleOk = async () => {
@@ -182,10 +198,6 @@ export default function AddEditTeaching({
   // };
 
   useEffect(() => {
-    if (defaultValues) {
-      setTeachings(defaultValues);
-      setClassTotalHours(defaultValues.assignedTeachingHours);
-    }
 
     async function fetchTeachers() {
       const loadedTeachers = await TeacherService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"); // Replace with your actual school unit ID
@@ -195,18 +207,21 @@ export default function AddEditTeaching({
       })));
       setTeachers(loadedTeachers);
     };
-    
-    async function fetchCourses() {
+  
+    async function fetchCourses(gradeId?: string) {
       try {
-        const response = await axios.get(`http://localhost:5191/api/courses`);
-        const data  = response.data.courses
+        const response = await TeachingService.getCourses(gradeId);
+        const data  = response
          .sort((a: Course, b: Course) => a.title.localeCompare(b.title)) as Course[];
-        
+
         setCoursesRemainingHours(data.map(course => ({
           id: course.id,
-          remainingHours: course.grade.hoursPerWeek,
-      })));
+          remainingHours: defaultValues
+            ? course.grade.hoursPerWeek - (defaultValues.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0)
+            : course.grade.hoursPerWeek,
+        })));
         setCourses(data);
+        setSelectedCourses([]);
       } catch (error) {
         console.error("Error fetching grades:", error);
       }
@@ -224,10 +239,23 @@ export default function AddEditTeaching({
       }
     }
 
+    fetchCourses(defaultValues?.grade.id);
     fetchTeachers();
-    fetchCourses();
     fetchSchoolClasses();
-    console.log("Courses", courses);
+
+    if (defaultValues) {
+      setTeachings(defaultValues.teachings?.map(t => ({
+        key: t.course.id + t.teacher.id,
+        course: t.course,
+        teacher: t.teacher,
+        totalHours: t.totalHours,
+        dispersion: t.dispersion,
+      })) || []);
+      setClassTotalHours(defaultValues.assignedTeachingHours);
+    } else {
+      setTeachings([]);
+      setClassTotalHours(0);
+    }
   }, [defaultValues, form, isModalOpen]);
 
   const onChange: InputNumberProps['onChange'] = (value) => {
@@ -238,12 +266,11 @@ export default function AddEditTeaching({
     mode: 'spinner' as const,
     min: 0,
     max: 10,
-    defaultValue: 0,
     onChange,
     style: { width: 50 },
   };
 
-  const renderActions = (value: any, record: TeachingEntity, index: number) => {
+  const renderActions = (value: any, record: Teaching, index: number) => {
     return (
       <Space>
         <Tooltip placement="topLeft" title="Διαγραφή">
@@ -274,11 +301,11 @@ export default function AddEditTeaching({
         </Descriptions>  
       )}
       <Divider orientation="left" orientationMargin={0} style={{ marginTop: 20 }}>Εισαγωγή</Divider>
-      <Form form={form} layout="vertical" >
+      <Form form={form} layout="vertical" initialValues={{ oneHourCount: 0, twoHourCount: 0 }}>
         {!defaultValues && (
           <Form.Item
             name="schoolClass"
-            label="Τάξη"
+            label="Τμήμα"
             rules={[{ required: true, message: "Παρακαλώ επιλέξτε τάξη!" }]}
           >
             <Select
@@ -287,12 +314,11 @@ export default function AddEditTeaching({
                 .map((schoolClass) => ({
                   key: schoolClass.id,
                   value: schoolClass.id,
-                  label: `${schoolClass.name} - ${schoolClasses.find(c => c.id === schoolClass.id)?.remainingHours} ώρες`,
+                  label: schoolClass.name,
+                  // label: `${schoolClass.name} - ${schoolClasses.find(c => c.id === schoolClass.id)?.remainingHours} ώρες`,
               }))}
               placeholder="Επιλέξτε τάξη"
-              // onChange={(value) => {
-              //     handleSchoolClassChange(value);
-              // }}
+              onChange={(value) => {handleSchoolClassChange(value);}}
             />
           </Form.Item>
         )}
@@ -304,7 +330,7 @@ export default function AddEditTeaching({
             style={{ display: "inline-block", width: "calc(65% - 8px)", marginRight: 16 }}
           >
             <Select
-              options={courses
+              options={selectedCourses
                 .filter((course) => (coursesRemainingHours.find(c => c.id === course.id)?.remainingHours ?? 0) > 0)
                 .map((course) => ({
                   key: course.id,
@@ -373,7 +399,7 @@ export default function AddEditTeaching({
          
         <Table
           size="small"
-          dataSource={teachings?.teachings }
+          dataSource={teachings}
           pagination={{ pageSize: 5 }}
           columns={[
             { title: 'Μάθημα', dataIndex: ['course', 'description'], key: 'course' },
@@ -394,7 +420,7 @@ export default function AddEditTeaching({
               dataIndex: '',
               key: 'x',
               align: 'center',
-              render: (_: any, record: TeachingEntity) => renderActions(null, record, 0),
+              render: (_: any, record: Teaching) => renderActions(null, record, 0),
             },
           ]}
         />

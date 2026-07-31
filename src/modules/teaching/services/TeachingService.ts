@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { TeachingEntity, TeachingPost, TeachingsGet } from "../types";
+import type { Course, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
 import { toast } from "react-toastify";
 import { useTeachings } from "../hooks/useTeaching";
 
@@ -10,7 +10,6 @@ async function getTeachings(schoolId: string): Promise<Array<TeachingEntity>> {
     const response = await axios.get<Array<TeachingsGet>>(
       `http://localhost:5191/api/schools/${schoolId}/teachings`
     );
-    console.log("Fetched teachings data:", response.data);
     return useTeachings(response.data);
   } catch (error) {
     console.error(error);
@@ -25,7 +24,6 @@ async function insertTeaching(data: TeachingPost) {
     toast.success(
       "Τα στοιχεία αποθηκεύτηκαν με επιτυχία!"
     );
-    console.log("Data submitted", data);
   } catch (error) {
     toast.error(
       "Σφάλμα κατά την αποθήκευση των στοιχείων."
@@ -34,7 +32,20 @@ async function insertTeaching(data: TeachingPost) {
   }
 }
 
+async function getCourses(gradeId?: string): Promise<Array<Course>> {
+  try {
+    const response = await axios.get(`http://localhost:5191/api/courses?gradeId=${gradeId ?? ""}`);
+    return response.data.courses;
+  } catch (error) {
+    console.error(error);
+    toast.error("Σφάλμα κατά την ανάκτηση των δεδομένων μαθημάτων.");
+    return [];
+  }
+}
+
+
 export const TeachingService = {
   load: getTeachings,
   insert: insertTeaching,
+  getCourses: getCourses,
 };
