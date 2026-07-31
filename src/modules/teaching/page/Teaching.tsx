@@ -2,7 +2,7 @@ import { Space, Table, Divider, Drawer, Descriptions, Tag, Row, Col, Card, Butto
 import { PlusOutlined, DeleteFilled, EditFilled, EditOutlined, PlusCircleOutlined, EyeFilled } from "@ant-design/icons";
 import AddEditTeaching from "../components/AddEditTeaching";
 import { useEffect, useState } from "react";
-import type { TeachingEntity, TeachingPost } from "../types";
+import type { TeachingEntity } from "../types";
 import { TeachingService } from "../services/TeachingService";
 
 export default function Teaching() {
@@ -24,6 +24,7 @@ export default function Teaching() {
       setData(response);
     };
     fetchData();
+    setReloadData(false);
   }, [reloadData]);
 
 

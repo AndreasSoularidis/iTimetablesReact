@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Course, TeachingDetails, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
+import type { Course, TeachingDelete, TeachingDetails, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
 import { toast } from "react-toastify";
 import { useTeachings } from "../hooks/useTeaching";
 
@@ -33,6 +33,15 @@ async function insertTeaching(data: TeachingPost): Promise<TeachingDetails | und
   }
 }
 
+async function deleteTeaching(teacher: TeachingDelete) : Promise<boolean> {
+  const { teacherId, schoolClassId, courseId } = teacher;
+  if (!schoolClassId || !teacherId || !courseId) {
+    return false;
+  }
+  await axios.delete(`http://localhost:5191/api/schools/teachings/${teacherId}/${schoolClassId}/${courseId}`);
+  return true;
+}
+
 async function getCourses(gradeId?: string): Promise<Array<Course>> {
   try {
     const response = await axios.get(`http://localhost:5191/api/courses?gradeId=${gradeId ?? ""}`);
@@ -49,4 +58,5 @@ export const TeachingService = {
   load: getTeachings,
   insert: insertTeaching,
   getCourses: getCourses,
+  delete: deleteTeaching,
 };

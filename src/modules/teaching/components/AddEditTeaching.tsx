@@ -15,6 +15,7 @@ import {
   type InputNumberProps,
 } from "antd";
 import { DeleteFilled  } from "@ant-design/icons";
+import type { TeachingDelete } from "../types";
 import { useEffect, useState } from "react";
 import type { Course, SchoolClassEntity, Teaching, TeachingEntity, TeachingPost } from "../types";
 import { toast } from "react-toastify";
@@ -62,13 +63,27 @@ export default function AddEditTeaching({
   };
 
   const handleDelete = async (teaching: Teaching) => {
-    setTeachings(prevTeachings => prevTeachings.filter(t => t.key !== teaching.key));
-    setCoursesRemainingHours(prev => prev.map(c => c.id === teaching.course.id ? { ...c, remainingHours: c.remainingHours + teaching.totalHours } : c));
-    setTeachersRemainingHours(prev => prev.map(t => t.id === teaching.teacher.id ? { ...t, remainingHours: t.remainingHours + teaching.totalHours } : t));
-    setClassTotalHours(prev => prev - teaching.totalHours);
-    if (teaching.teacher.id === selectedTeacher) {
-      const updatedRemaining = (teachersRemainingHours.find(t => t.id === teaching.teacher.id)?.remainingHours ?? 0) + teaching.totalHours;
-      form.setFieldsValue({ teacherRemainingHours: updatedRemaining });
+    const teachingToDelete: TeachingDelete = {
+      teacherId: teaching.teacher.id,
+      schoolClassId: teaching.schoolClass?.id!,
+      courseId: teaching.course.id,
+    };
+    console.log("Deleting teaching:", teachingToDelete);
+    try{
+      const success = await TeachingService.delete(teachingToDelete);
+      if(success){
+        setTeachings(prevTeachings => prevTeachings.filter(t => t.key !== teaching.key));
+        setCoursesRemainingHours(prev => prev.map(c => c.id === teaching.course.id ? { ...c, remainingHours: c.remainingHours + teaching.totalHours } : c));
+        setTeachersRemainingHours(prev => prev.map(t => t.id === teaching.teacher.id ? { ...t, remainingHours: t.remainingHours + teaching.totalHours } : t));
+        setClassTotalHours(prev => prev - teaching.totalHours);
+        if (teaching.teacher.id === selectedTeacher) {
+          const updatedRemaining = (teachersRemainingHours.find(t => t.id === teaching.teacher.id)?.remainingHours ?? 0) + teaching.totalHours;
+          form.setFieldsValue({ teacherRemainingHours: updatedRemaining });
+        }
+        toast.success("Η διδασκαλία διαγράφηκε με επιτυχία!");
+      }
+    } catch (error) {
+      toast.error("Σφάλμα κατά τη διαγραφή της διδασκαλίας.");
     }
   };
 
@@ -149,6 +164,7 @@ export default function AddEditTeaching({
 
       const newTeaching: Teaching= {
         key: `${response?.teacher.id}-${response?.course.id}`,
+        schoolClass: { id: selectedSchoolClass?.id!, description: selectedSchoolClass?.name! },
         teacher: { id: response?.teacher.id!, description: teacher?.name!},
         course: { id: response?.course.id!, description: course?.title! },
         totalHours: assignedHours,
@@ -220,6 +236,7 @@ export default function AddEditTeaching({
     if (defaultValues) {
       setTeachings(defaultValues.teachings?.map(t => ({
         key: t.course.id + t.teacher.id,
+        schoolClass: {id: defaultValues.schoolClassId, description: defaultValues.name},
         course: t.course,
         teacher: t.teacher,
         totalHours: t.totalHours,
@@ -249,7 +266,7 @@ export default function AddEditTeaching({
       <Space>
         <Tooltip placement="topLeft" title="Διαγραφή">
           <Button
-             onClick={(e) => { e.stopPropagation(); handleDelete(record); }}
+             onClick={() => {handleDelete(record); }}
             danger
           >
             <DeleteFilled />
@@ -264,7 +281,7 @@ export default function AddEditTeaching({
       title={defaultValues ? `Διδασκαλίες ${defaultValues?.name}` : "Νέες Διδασκαλίες"}
       open={isModalOpen}
       onCancel={handleCancel}
-      onOk={onSubmit}
+      onOk={() => { form.resetFields(); onSubmit(); }}
       width={700}
     >
       {defaultValues && (

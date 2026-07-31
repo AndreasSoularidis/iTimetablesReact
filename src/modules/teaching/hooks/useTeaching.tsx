@@ -5,6 +5,7 @@ export function useTeachings(requestData: any): TeachingEntity[] {
   return requestData.data
     .map((teaching: TeachingsGet, index: number) => ({
       key: `teaching-${index}`,
+      schoolClassId: teaching.schoolClass.id,
       name: teaching.schoolClass.name,
       grade: teaching.schoolClass.grade,
       teachingHours: teaching.schoolClass.teachingHours,

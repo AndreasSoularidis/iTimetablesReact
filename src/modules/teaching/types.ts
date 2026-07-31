@@ -3,6 +3,12 @@ export interface TeachingsGet {
     teachings?: TeachingDetails[];
 }
 
+export interface TeachingDelete {
+    teacherId: string;
+    schoolClassId: string;
+    courseId: string;
+}
+
 export interface TeachingDetails {
     teacher: LookUp;
     course: LookUp;
@@ -24,7 +30,7 @@ export interface SchoolClass {
 
 export interface TeachingEntity {
     key: string;
-    // schoolUnitId: string;
+    schoolClassId: string;
     name: string;
     grade: LookUp;
     teachingHours: number;
@@ -34,6 +40,7 @@ export interface TeachingEntity {
 
 export interface Teaching {
     key: string;
+    schoolClass: LookUp;
     course: LookUp;
     teacher: LookUp;
     totalHours: number;
@@ -47,6 +54,14 @@ export interface TeachingPost{
     totalHours: number;
     dispersion: number[];
 }
+
+// export interface TeachingPostResponse{
+//     schoolClass: LookUp;
+//     teacher: LookUp;
+//     course: LookUp;
+//     totalHours: number;
+//     dispersion: number[];
+// }
 
 export interface SchoolClassEntity {
     id: string;
