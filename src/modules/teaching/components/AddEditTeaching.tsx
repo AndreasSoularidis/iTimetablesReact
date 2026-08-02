@@ -4,7 +4,6 @@ import {
   Divider,
   Flex,
   Form,
-  Input,
   InputNumber,
   Modal,
   Select,
@@ -17,7 +16,7 @@ import {
 import { DeleteFilled  } from "@ant-design/icons";
 import type { TeachingDelete } from "../types";
 import { useEffect, useState } from "react";
-import type { Course, SchoolClassEntity, Teaching, TeachingEntity, TeachingPost } from "../types";
+import type { Course, GradeCourses, SchoolClassEntity, Teaching, TeachingEntity, TeachingPost } from "../types";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { TeacherService } from "../../teacher/services/TeacherService";
@@ -40,14 +39,13 @@ export default function AddEditTeaching({
 {
   const [teachers, setTeachers] = useState<TeacherEntity[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<string>("");
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<GradeCourses[]>([]);
   const [selectedCourses, setSelectedCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string>("");
   const [teachings, setTeachings] = useState<Teaching[]>([]);
   const [classTotalHours, setClassTotalHours] = useState<number>( 0);
   const [schoolClasses, setSchoolClasses] = useState<SchoolClassEntity[] >([]);
   const [selectedSchoolClass, setSelectedSchoolClass] = useState<{id: string, name: string, gradeId: string} | null>(null);
-  const [teacherAssignedHours, setTeacherAssignedHours] = useState<number>(0);
 
   const [form] = Form.useForm();
 
@@ -68,7 +66,6 @@ export default function AddEditTeaching({
       schoolClassId: teaching.schoolClass?.id!,
       courseId: teaching.course.id,
     };
-    console.log("Deleting teaching:", teachingToDelete);
     try{
       const success = await TeachingService.delete(teachingToDelete);
       if(success){
@@ -91,10 +88,13 @@ export default function AddEditTeaching({
     const selectedClass = schoolClasses.find(c => c.id === value);
     setSelectedSchoolClass(selectedClass ? { id: selectedClass.id, name: selectedClass.name, gradeId: selectedClass.grade.id } : null);
     form.setFieldsValue({ schoolClass: value });
-    const gradeCouses = courses.filter(c => c.grade.id === selectedClass?.grade.id);
-    setSelectedCourses(gradeCouses);
-    // setSelectedCourse("");
-    // form.setFieldsValue({ course: undefined, assignedHours: undefined, oneHourCount: undefined, twoHourCount: undefined });
+    const gradeCouse = courses.filter(c => c.grade.id === selectedClass?.grade.id);
+    setSelectedCourses(gradeCouse[0].courses);
+    setCoursesRemainingHours(gradeCouse[0].courses.map(course => ({
+      id: course.id,
+      remainingHours: (course.totalHours - (selectedClass?.assignedHours ?? 0)),
+    })));
+    form.setFieldsValue({ course: undefined, assignedHours: undefined, oneHourCount: undefined, twoHourCount: undefined });
   };
 
   const handleTeacherChange = (value: string) => {
@@ -112,7 +112,7 @@ export default function AddEditTeaching({
 
   const handleAddTeaching = async () => {
     const teacher = teachers.find(t => t.key === selectedTeacher);
-    const course = courses.find(c => c.id === selectedCourse);
+    const course = selectedCourses.find(c => c.id === selectedCourse);
     const assignedHours = form.getFieldValue("assignedHours");
     const oneHoursCount = form.getFieldValue("oneHourCount") ?? 0;
     const twoHoursCount = form.getFieldValue("twoHourCount") ?? 0;
@@ -135,7 +135,7 @@ export default function AddEditTeaching({
     }
 
     // H Κατανομή έχει περισσότερες ώρες από της εβδομάδας του μαθήματος
-    if (assignedHours > (course?.grade?.hoursPerWeek ?? 0)) {
+    if (assignedHours > (course?.totalHours ?? 0)) {
       toast.error("Η κατανομή των ωρών διδασκαλίας υπερβαίνει τις ώρες ανά εβδομάδα του μαθήματος.");
       return;
     }
@@ -147,13 +147,13 @@ export default function AddEditTeaching({
     }
 
     // H κατανομή των ωρών δεν ταιριάζει με τις ώρες ανά εβδομάδα του μαθήματος
-    if (dispersionHours > (course?.grade?.hoursPerWeek ?? 0)) {
+    if (dispersionHours > (course?.totalHours ?? 0)) {
       toast.error("Το σύνολο των ωρών διδασκαλίας δεν ταιριάζει με την κατανομή.");
       return;
     }
 
     const dataToSubmit: TeachingPost = {
-      schoolClassId: selectedSchoolClass?.id || "",
+      schoolClassId: selectedSchoolClass?.id || defaultValues?.schoolClassId! ,
       teacherId: selectedTeacher,
       courseId: selectedCourse,
       totalHours: assignedHours,
@@ -178,9 +178,9 @@ export default function AddEditTeaching({
       setClassTotalHours(prev => prev + newTeaching.totalHours);
       form.setFieldsValue({ teacherRemainingHours: updatedTeacherRemainingHours });
       form.resetFields(["course", "teacher", "assignedHours", "oneHourCount", "twoHourCount", "teacherRemainingHours"]);
-      if(course?.grade?.hoursPerWeek === 0){
-        setCourses(prev => prev.filter(c => c.id !== selectedCourse));
-      }
+      // if(course?.totalHours === 0){
+      //   setSelectedCourses(prev => prev.filter(c => c.id !== selectedCourse));
+      // }
     } catch {
       toast.error("Παρακαλώ συμπληρώστε όλα τα απαιτούμενα πεδία.");
     }
@@ -198,20 +198,18 @@ export default function AddEditTeaching({
       setTeachers(loadedTeachers);
     };
   
-    async function fetchCourses(gradeId?: string) {
+    async function fetchCourses() {
       try {
-        const response = await TeachingService.getCourses(gradeId);
-        const data  = response
-         .sort((a: Course, b: Course) => a.title.localeCompare(b.title)) as Course[];
-
-        // setCoursesRemainingHours(data.map(course => ({
-        //   id: course.id,
-        //   remainingHours: defaultValues
-        //     ? course.grade.hoursPerWeek - (defaultValues.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0)
-        //     : course.grade.hoursPerWeek,
-        // })));
+        const data = await TeachingService.getCourses();
+        // const data = response
+        //  .sort((a: Course, b: Course) => a.title.localeCompare(b.title)) as Course[];
         setCourses(data);
-        setSelectedCourses(gradeId ? data.filter(c => c.grade.id === gradeId) : data);
+        // const filtered = gradeId ? data.filter(c => c.grade.id === gradeId) : data;
+       
+        // setCoursesRemainingHours(filtered.map(course => ({
+        //   id: course.id,
+        //   remainingHours: course.hoursPerWeek - (defaultValues?.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0),
+        // })));
       } catch (error) {
         console.error("Error fetching grades:", error);
       }
@@ -229,11 +227,13 @@ export default function AddEditTeaching({
       }
     }
 
-    fetchCourses(defaultValues?.grade.id);
+    fetchCourses();
     fetchTeachers();
     fetchSchoolClasses();
-
+    setSelectedCourses([]);
     if (defaultValues) {
+      console.log("defaultValues.teachings:", defaultValues.teachings);
+      console.log("CoursesRemainingHours:", coursesRemainingHours);
       setTeachings(defaultValues.teachings?.map(t => ({
         key: t.course.id + t.teacher.id,
         schoolClass: {id: defaultValues.schoolClassId, description: defaultValues.name},
@@ -242,14 +242,12 @@ export default function AddEditTeaching({
         totalHours: t.totalHours,
         dispersion: t.dispersion,
       })) || []);
-
-      setCoursesRemainingHours(courses.map(course => ({
+      const filtered = courses.filter(c => c.grade.id === defaultValues?.grade.id);
+      setSelectedCourses(filtered[0]?.courses.sort((a: Course, b: Course) => a.title.localeCompare(b.title)));
+      setCoursesRemainingHours(filtered[0]?.courses.map(course => ({
         id: course.id,
-        remainingHours: defaultValues
-          ? course.grade.hoursPerWeek - (defaultValues.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0)
-          : course.grade.hoursPerWeek,
-      })));
-
+        remainingHours: course.totalHours - (defaultValues?.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0),
+      })) || []);
       setClassTotalHours(defaultValues.assignedTeachingHours);
     } else {
       setTeachings([]);
@@ -268,9 +266,6 @@ export default function AddEditTeaching({
     onChange,
     style: { width: 50 },
   };
-
-  console.log("coursesRemainingHours", coursesRemainingHours);
-  console.log("selectedCourses", selectedCourses);
 
   const renderActions = (value: any, record: Teaching, index: number) => {
     return (
@@ -312,7 +307,7 @@ export default function AddEditTeaching({
           >
             <Select
               options={schoolClasses
-                // .filter((schoolClass) => (schoolClasses.find(c => c.id === schoolClass.id)? == 0))
+                .filter((schoolClass) => (schoolClasses.find(c => c.id === schoolClass.id)?.assignedHours ?? 0) == 0)
                 .map((schoolClass) => ({
                   key: schoolClass.id,
                   value: schoolClass.id,

@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Course, TeachingDelete, TeachingDetails, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
+import type { Course, GradeCourses, TeachingDelete, TeachingDetails, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
 import { toast } from "react-toastify";
 import { useTeachings } from "../hooks/useTeaching";
 
@@ -42,10 +42,10 @@ async function deleteTeaching(teacher: TeachingDelete) : Promise<boolean> {
   return true;
 }
 
-async function getCourses(gradeId?: string): Promise<Array<Course>> {
+async function getCourses(): Promise<Array<GradeCourses>> {
   try {
-    const response = await axios.get(`http://localhost:5191/api/courses?gradeId=${gradeId ?? ""}`);
-    return response.data.courses;
+    const response = await axios.get(`http://localhost:5191/api/schoolgrades/courses`);
+    return response.data;
   } catch (error) {
     console.error(error);
     toast.error("Σφάλμα κατά την ανάκτηση των δεδομένων μαθημάτων.");

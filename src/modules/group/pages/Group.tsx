@@ -36,7 +36,7 @@ export default function Group() {
     const handleSubmit = async (group: GroupPost) => {
     try{
         if(selectedGroup){
-            const groupToUpdate = { ...group, id: selectedGroup.key };
+            const groupToUpdate = { ...group, id: selectedGroup.key, assignedHours: selectedGroup.assignedHours };
             console.log("Updating group:", groupToUpdate);
             await GroupService.update(groupToUpdate);
             setReload((prev) => !prev);

@@ -59,21 +59,20 @@ export interface SchoolClassEntity {
     id: string;
     name: string;
     totalHours: number;
+    assignedHours: number;
     short: string;
     grade: LookUp;
     schoolUnitId: string;
 }
 
+export interface GradeCourses {
+    grade: LookUp;
+    courses: Course[];
+}
+
 export interface Course{
     id: string;
     title: string;
-    short: string;
-    grade: Grade;
-}
-
-export interface Grade{
-    id: string;
-    description: string;
-    hoursPerWeek: number;
+    totalHours: number;
 }
 

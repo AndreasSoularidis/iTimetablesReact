@@ -2,6 +2,7 @@ export interface GroupGet {
     id: string;
     name: string;
     totalHours: number;
+    assignedHours: number;
     short: string;
     color: string;
     grade: LookUp;
@@ -26,6 +27,7 @@ export interface GroupPut {
     id: string;
     name: string;
     totalHours: number;
+    assignedHours: number;
     short: string;
     color: string;
     gradeId: string;
@@ -36,6 +38,7 @@ export interface GroupEntity {
     key: string;
     name: string;
     totalHours: number;
+    assignedHours: number;
     short?: string;
     color?: string;
     grade: LookUp;
