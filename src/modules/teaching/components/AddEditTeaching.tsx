@@ -193,7 +193,7 @@ export default function AddEditTeaching({
       const loadedTeachers = await TeacherService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"); // Replace with your actual school unit ID
       setTeachersRemainingHours(loadedTeachers.map(teacher => ({
           id: teacher.key,
-          remainingHours: teacher.mandatoryTeachingHours,
+          remainingHours: teacher.mandatoryTeachingHours - teacher.assignedTeachingHours,
       })));
       setTeachers(loadedTeachers);
     };
@@ -204,14 +204,14 @@ export default function AddEditTeaching({
         const data  = response
          .sort((a: Course, b: Course) => a.title.localeCompare(b.title)) as Course[];
 
-        setCoursesRemainingHours(data.map(course => ({
-          id: course.id,
-          remainingHours: defaultValues
-            ? course.grade.hoursPerWeek - (defaultValues.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0)
-            : course.grade.hoursPerWeek,
-        })));
+        // setCoursesRemainingHours(data.map(course => ({
+        //   id: course.id,
+        //   remainingHours: defaultValues
+        //     ? course.grade.hoursPerWeek - (defaultValues.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0)
+        //     : course.grade.hoursPerWeek,
+        // })));
         setCourses(data);
-        setSelectedCourses([]);
+        setSelectedCourses(gradeId ? data.filter(c => c.grade.id === gradeId) : data);
       } catch (error) {
         console.error("Error fetching grades:", error);
       }
@@ -242,6 +242,14 @@ export default function AddEditTeaching({
         totalHours: t.totalHours,
         dispersion: t.dispersion,
       })) || []);
+
+      setCoursesRemainingHours(courses.map(course => ({
+        id: course.id,
+        remainingHours: defaultValues
+          ? course.grade.hoursPerWeek - (defaultValues.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0)
+          : course.grade.hoursPerWeek,
+      })));
+
       setClassTotalHours(defaultValues.assignedTeachingHours);
     } else {
       setTeachings([]);
@@ -260,6 +268,9 @@ export default function AddEditTeaching({
     onChange,
     style: { width: 50 },
   };
+
+  console.log("coursesRemainingHours", coursesRemainingHours);
+  console.log("selectedCourses", selectedCourses);
 
   const renderActions = (value: any, record: Teaching, index: number) => {
     return (
@@ -301,7 +312,7 @@ export default function AddEditTeaching({
           >
             <Select
               options={schoolClasses
-                // .filter((schoolClass) => (schoolClasses.find(c => c.id === schoolClass.id)?.remainingHours ?? 0) > 0)
+                // .filter((schoolClass) => (schoolClasses.find(c => c.id === schoolClass.id)? == 0))
                 .map((schoolClass) => ({
                   key: schoolClass.id,
                   value: schoolClass.id,
@@ -318,7 +329,7 @@ export default function AddEditTeaching({
             name="course"
             label="Μάθημα"
             rules={[{ required: true, message: "Παρακαλώ επιλέξτε μάθημα!" }]}
-            style={{ display: "inline-block", width: "calc(65% - 8px)", marginRight: 16 }}
+            style={{ display: "inline-block", width: "calc(50% - 8px)", marginRight: 16 }}
           >
             <Select
               options={selectedCourses
@@ -336,46 +347,34 @@ export default function AddEditTeaching({
           </Form.Item>
           <Form.Item
             name="assignedHours"
-            label="Ανατεθειμένες Ώρες"
+            label="Ώρες/Εβδομαδα"
             rules={[{ required: true, message: "Παρακαλώ εισάγετε το σύνολο ωρών διδασκαλίας!" }]}
-            style={{ display: "inline-block", width: "calc(35% - 8px)" }}
-          >
-            <InputNumber />
-          </Form.Item>
-        </Form.Item>
-        <Form.Item style={{ marginBottom: 0 }}>
-          <Form.Item
-            name="teacher"
-            label="Εκπαιδευτικός"
-            rules={[{ required: true, message: "Παρακαλώ επιλέξτε εκπαιδευτικό!" }]}
-            style={{ display: "inline-block", width: "calc(75% - 8px)", marginRight: 16 }}
-          >
-            <Select
-              options={teachers.map((teacher) => ({
-                  key: teacher.key,
-                  value: teacher.key,
-                  label: teacher.name,
-              }))}
-              placeholder="Επιλέξτε εκπαιδευτικό"
-              onChange={(value) => handleTeacherChange(value)}
-            />
-          </Form.Item>
-          <Form.Item
-            name="teacherRemainingHours"
-            label="Υπολειπόμενες Ώρες"
             style={{ display: "inline-block", width: "calc(25% - 8px)" }}
-            >
-              <Input disabled />
+          >
+            <InputNumber style={{ width: "75%" }} />
+          </Form.Item>
+          <Form.Item name="oneHourCount" label="Μονόωρα" style={{ display: "inline-block", marginBottom: 0, marginRight: 8, width: "calc(13% - 8px)" }}>
+            <InputNumber {...sharedProps} />
+          </Form.Item>
+          <Form.Item name="twoHourCount" label="Δύωρα" style={{ display: "inline-block", marginBottom: 0, width: "calc(12.5% - 8px)" }}>
+            <InputNumber {...sharedProps} />
           </Form.Item>
         </Form.Item>
-        <Flex gap="small" align="center" wrap>
-          <Form.Item name="oneHourCount" label="Μονόωρα" style={{ marginBottom: 0 }}>
-            <InputNumber {...sharedProps} placeholder="Outlined" />
-          </Form.Item>
-          <Form.Item name="twoHourCount" label="Δύωρα" style={{ marginBottom: 0 }}>
-            <InputNumber {...sharedProps}  placeholder="Filled" />
-          </Form.Item>
-        </Flex>
+        <Form.Item
+          name="teacher"
+          label="Εκπαιδευτικός"
+          rules={[{ required: true, message: "Παρακαλώ επιλέξτε εκπαιδευτικό!" }]}
+        >
+          <Select
+            options={teachers.map((teacher) => ({
+                key: teacher.key,
+                value: teacher.key,
+                label: `${teacher.name} - ${teachersRemainingHours.find(t => t.id === teacher.key)?.remainingHours} ώρες διαθέσιμες`,
+            }))}
+            placeholder="Επιλέξτε εκπαιδευτικό"
+            onChange={(value) => handleTeacherChange(value)}
+          />
+        </Form.Item>
         </Form>
         <Flex justify="flex-end" style={{ marginTop: 8 }}>
           <Button   

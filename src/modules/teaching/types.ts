@@ -55,14 +55,6 @@ export interface TeachingPost{
     dispersion: number[];
 }
 
-// export interface TeachingPostResponse{
-//     schoolClass: LookUp;
-//     teacher: LookUp;
-//     course: LookUp;
-//     totalHours: number;
-//     dispersion: number[];
-// }
-
 export interface SchoolClassEntity {
     id: string;
     name: string;

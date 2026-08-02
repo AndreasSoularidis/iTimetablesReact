@@ -6,6 +6,7 @@ export interface TeacherGet {
     color: string;
     continuousTeachingHours: number;
     mandatoryTeachingHours: number;
+    assignedTeachingHours: number;
     availabilities: number[];
     teachings?: Teachings[];
     specialty: string;
@@ -62,6 +63,7 @@ export interface TeacherEntity {
     color: string;
     continuousTeachingHours: number;
     mandatoryTeachingHours: number;
+    assignedTeachingHours: number;
     availabilities: number[];
     teachings: Teachings[];
     specialty: string;
