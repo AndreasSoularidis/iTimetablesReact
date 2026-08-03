@@ -9,6 +9,7 @@ export function useTeachers(requestData: any): TeacherEntity[] {
     color: teacher.color,
     continuousTeachingHours: teacher.continuousTeachingHours,
     mandatoryTeachingHours: teacher.mandatoryTeachingHours,
+    assignedTeachingHours: teacher.assignedTeachingHours,
     availabilities: teacher.availabilities,
     teachings: teacher.teachings ?? [],
     specialty: teacher.specialty,

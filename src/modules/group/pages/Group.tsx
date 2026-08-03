@@ -2,23 +2,16 @@ import { App, Button, Card, Col, Divider, Row, Space } from "antd";
 import { EditOutlined, PlusOutlined, DeleteFilled, PlusCircleOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { GroupService } from "../../group/services/GroupServices";
-import type { GroupEntity, GroupPost, TeachingPost } from "../../group/types";
+import type { GroupEntity, GroupPost } from "../../group/types";
 import AddEditGroup from "../components/AddEditGroup";
-import AddEditTeaching from "../components/AddEditTeaching";
 
 export default function Group() {
     const { modal } = App.useApp();
     const [data, setData] = useState<GroupEntity[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [teachingModalOpen, setTeachingModalOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<GroupEntity | null>(null);
     const [reload, setReload] = useState(false);
 
-    const handleAddTeaching = (group: GroupEntity) => {
-        setTeachingModalOpen(true);
-        setSelectedGroup(group);
-        console.log("Add teaching clicked for group:", group);
-    }
 
     const handleEdit = (group: GroupEntity) => {
         setSelectedGroup(group);
@@ -43,7 +36,7 @@ export default function Group() {
     const handleSubmit = async (group: GroupPost) => {
     try{
         if(selectedGroup){
-            const groupToUpdate = { ...group, id: selectedGroup.key };
+            const groupToUpdate = { ...group, id: selectedGroup.key, assignedHours: selectedGroup.assignedHours };
             console.log("Updating group:", groupToUpdate);
             await GroupService.update(groupToUpdate);
             setReload((prev) => !prev);
@@ -56,17 +49,6 @@ export default function Group() {
     }
     setModalOpen(false);
     setSelectedGroup(null);
-    };
-
-    const handleTeachingSubmit = async (teaching: TeachingPost) => {
-    try{
-        await GroupService.insertTeaching(teaching);
-        // setReload((prev) => !prev);
-    } catch (error) {
-        console.error("Error submitting teaching:", error);
-    }
-    // setTeachingModalOpen(false);
-    // setSelectedGroup(null);
     };
 
     useEffect(() => {
@@ -94,37 +76,30 @@ export default function Group() {
                 </Button>
             </Space>
             <Row gutter={[16, 16]}>
-                    {data.map((group) => {
-                        const actions: React.ReactNode[] = [
-                            <EditOutlined key="edit" onClick={() => handleEdit(group)}/>,
-                            <DeleteFilled key="delete" onClick={() => handleDelete(group)}/>,
-                            <PlusCircleOutlined key="addTeaching" onClick={() => handleAddTeaching(group)}/>
-                        ];
-                        
-                        return (
-                        <Col key={group.key} span={8}>
-                            <Card title={`Τμήμα ${group.name}`} 
-                                actions={actions} 
-                                type="inner" 
-                                >
-                                <p>Σύνολο Ωρών Διδασκαλίας: {group.totalHours}</p>
-                                <p>Τάξη: {group.grade.description}</p>
-                            </Card>
-                        </Col>
-                        );
-                    })}
+                {data.map((group) => {
+                    const actions: React.ReactNode[] = [
+                        <EditOutlined key="edit" onClick={() => handleEdit(group)}/>,
+                        <DeleteFilled key="delete" onClick={() => handleDelete(group)}/>,
+                    ];
+                    
+                    return (
+                    <Col key={group.key} span={8}>
+                        <Card title={`Τμήμα ${group.name}`} 
+                            actions={actions} 
+                            type="inner" 
+                            >
+                            <p>Σύνολο Ωρών Διδασκαλίας: {group.totalHours}</p>
+                            <p>Τάξη: {group.grade.description}</p>
+                        </Card>
+                    </Col>
+                    );
+                })}
             </Row>
             <AddEditGroup
                 isModalOpen={modalOpen}
                 modifyIsModalOpen={setModalOpen}
                 defaultEditValues={selectedGroup ?? undefined}
                 onSubmit={handleSubmit}
-            />
-            <AddEditTeaching
-                isModalOpen={teachingModalOpen}
-                modifyIsModalOpen={setTeachingModalOpen}
-                schoolClass={selectedGroup ?? undefined}
-                onSubmit={handleTeachingSubmit}
             />
         </>
     );
