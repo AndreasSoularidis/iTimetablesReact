@@ -267,7 +267,7 @@ export default function AddEditTeaching({
     style: { width: 50 },
   };
 
-  const renderActions = (value: any, record: Teaching, index: number) => {
+  const renderActions = (record: Teaching) => {
     return (
       <Space>
         <Tooltip placement="topLeft" title="Διαγραφή">
@@ -405,7 +405,7 @@ export default function AddEditTeaching({
               dataIndex: '',
               key: 'x',
               align: 'center',
-              render: (_: any, record: Teaching) => renderActions(null, record, 0),
+              render: (_: any, record: Teaching) => renderActions(record),
             },
           ]}
         />

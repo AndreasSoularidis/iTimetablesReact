@@ -1,5 +1,5 @@
 import { Space, Table, Divider, Drawer, Descriptions, Tag, Row, Col, Card, Button } from "antd";
-import { PlusOutlined, DeleteFilled, EditFilled, EditOutlined, PlusCircleOutlined, EyeFilled } from "@ant-design/icons";
+import { PlusOutlined, PlusCircleOutlined, EyeFilled } from "@ant-design/icons";
 import AddEditTeaching from "../components/AddEditTeaching";
 import { useEffect, useState } from "react";
 import type { TeachingEntity } from "../types";
@@ -46,11 +46,7 @@ export default function Teaching() {
       <Row gutter={[16, 16]}>
         {data.map((group) => {
           const actions: React.ReactNode[] = [
-              // <EditOutlined key="edit" onClick={() => handleEdit(group)}/>,
-              // <DeleteFilled key="delete" onClick={() => handleDelete(group)}/>,
-              // <PlusCircleOutlined key="addTeaching" onClick={() => handleAddTeaching(group)}/>
               <EyeFilled key="show" onClick={() => { setDrawerOpen(true); setSelectedTeaching(group); }} />,
-              <DeleteFilled key="delete" />,
               <PlusCircleOutlined key="addTeaching" onClick={() => { setIsModalOpen(true); setSelectedTeaching(group); }} />
           ];
           
