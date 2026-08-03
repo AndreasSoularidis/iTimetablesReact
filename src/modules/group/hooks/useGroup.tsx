@@ -6,8 +6,10 @@ export function useGroups(requestData: any): GroupEntity[] {
     key: group.id,
     name: group.name,
     totalHours: group.totalHours,
+    assignedHours: group.assignedHours,
     short: group.short,
     color: group.color,
+    grade: group.grade,
     schoolUnitId: group.schoolUnitId,
   }));
 }
@@ -17,8 +19,10 @@ export function useGroup(group: any): GroupEntity {
     key: group.id,
     name: group.name,
     totalHours: group.totalHours,
+    assignedHours: group.assignedHours,
     short: group.short,
     color: group.color,
+    grade: group.grade,
     schoolUnitId: group.schoolUnitId,
   };
 }

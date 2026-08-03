@@ -1,5 +1,5 @@
 import { App, Button, Card, Col, Divider, Row, Space } from "antd";
-import { EditOutlined, PlusOutlined, DeleteFilled } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined, DeleteFilled, PlusCircleOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { GroupService } from "../../group/services/GroupServices";
 import type { GroupEntity, GroupPost } from "../../group/types";
@@ -11,6 +11,7 @@ export default function Group() {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<GroupEntity | null>(null);
     const [reload, setReload] = useState(false);
+
 
     const handleEdit = (group: GroupEntity) => {
         setSelectedGroup(group);
@@ -35,7 +36,7 @@ export default function Group() {
     const handleSubmit = async (group: GroupPost) => {
     try{
         if(selectedGroup){
-            const groupToUpdate = { ...group, id: selectedGroup.key };
+            const groupToUpdate = { ...group, id: selectedGroup.key, assignedHours: selectedGroup.assignedHours };
             console.log("Updating group:", groupToUpdate);
             await GroupService.update(groupToUpdate);
             setReload((prev) => !prev);
@@ -75,23 +76,24 @@ export default function Group() {
                 </Button>
             </Space>
             <Row gutter={[16, 16]}>
-                    {data.map((group) => {
-                        const actions: React.ReactNode[] = [
-                            <EditOutlined key="edit" onClick={() => handleEdit(group)}/>,
-                            <DeleteFilled key="delete" onClick={() => handleDelete(group)}/>,
-                        ];
-                        
-                        return (
-                        <Col key={group.key} span={8}>
-                            <Card title={`Τμήμα ${group.name}`} 
-                                actions={actions} 
-                                type="inner" 
-                                >
-                                Σύνολο Ωρών Διδασκαλίας: {group.totalHours}
-                            </Card>
-                        </Col>
-                        );
-                    })}
+                {data.map((group) => {
+                    const actions: React.ReactNode[] = [
+                        <EditOutlined key="edit" onClick={() => handleEdit(group)}/>,
+                        <DeleteFilled key="delete" onClick={() => handleDelete(group)}/>,
+                    ];
+                    
+                    return (
+                    <Col key={group.key} span={8}>
+                        <Card title={`Τμήμα ${group.name}`} 
+                            actions={actions} 
+                            type="inner" 
+                            >
+                            <p>Σύνολο Ωρών Διδασκαλίας: {group.totalHours}</p>
+                            <p>Τάξη: {group.grade.description}</p>
+                        </Card>
+                    </Col>
+                    );
+                })}
             </Row>
             <AddEditGroup
                 isModalOpen={modalOpen}

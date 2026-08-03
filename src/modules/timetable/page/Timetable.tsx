@@ -1,21 +1,36 @@
-import { Button, Descriptions, Divider, List, Space } from "antd";
+import { Button, Descriptions, Divider, List, Space, Switch } from "antd";
 import { DownloadOutlined, ThunderboltFilled } from "@ant-design/icons";
 import TimeslotsTable from "../../../shared/TimeslotsTable/TimeslotsTable";
 import { useEffect, useState } from "react";
 import { TimetableService } from "../services/TimetableService";
-import type { TimetableEntity } from "../types";
+import type { TimetableEntity, TimetablePost } from "../types";
 
 export default function Timetable() {
     const [data, setData] = useState<TimetableEntity[]>([]);
     const [details, setDetails] = useState<{ key: string; label: string; children: string }[]>([]);
+    const [showViolations, setShowViolations] = useState<boolean>(true);
+
+    const onChange = (checked: boolean) => {
+        setShowViolations(checked);
+    };
+
+    const handleSubmit = async () => {
+        const data : TimetablePost = {
+            schoolId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"
+        };
+        var response = await TimetableService.create(data);
+        console.log("Timetable creation response:", response);
+    }
 
     useEffect(() => {
         const fetchData = async () => {
             const response = await TimetableService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
             setData(response);
+            const status = response[0].feasible ? "Βέλτιστο" : "Μη Εφικτό";
+            const fitness = 100 - response[0].fitness;
             setDetails([
-                { key: "1", label: "Εφικτό", children: response[0].feasible.toString() },
-                { key: "2", label: "Βαθμολογία", children: response[0].fitness.toString() },
+                { key: "1", label: "Κατάσταση", children: status },
+                { key: "2", label: "Βαθμολογία", children: fitness.toPrecision(4).toString() },
                 { key: "3", label: "Πλήθος Παραβιάσεων", children: response[0].description.length.toString() },
             ]);
         };
@@ -33,9 +48,8 @@ export default function Timetable() {
                 size="large"
                 icon={<ThunderboltFilled />}
                 style={{ fontSize: 16, padding: "0 16px" }}
-                >
-                Δημιουργία 
-                </Button>
+                onClick = {handleSubmit}
+                >Δημιουργία</Button>
             </Space>
             <Space style={{ marginLeft: 16 }}>
                 <Button
@@ -43,19 +57,24 @@ export default function Timetable() {
                 size="large"
                 icon={<DownloadOutlined />}
                 style={{ fontSize: 16, padding: "0 16px" }}
-                >
-                Eξαγωγή σε Excel 
-                </Button>
+                >Eξαγωγή σε Excel</Button>
             </Space>
             {data.length > 0 && <TimeslotsTable timeslots={data[0].timeslots} hours={data[0].school.maxHoursPerDay} days={data[0].school.teachingDays} classes={data[0].school.schoolClasses} />}
             <Descriptions title="" items={details} style={{ marginTop: 16 }} />
-            <Divider orientation="start" orientationMargin={0}>Παραβιάσεις</Divider>
-            <List
-                size="large"
-                bordered
-                dataSource={data[0]?.description ?? []}
-                renderItem={(item) => <List.Item>{item}</List.Item>}
-            />
+            <Space style={{ marginTop: 16, marginBottom: 16 }}>
+                Εμφάνιση Παραβιάσεων: <Switch defaultChecked onChange={onChange} />
+            </Space>
+            {showViolations && (
+                <>
+                <Divider orientation="start" orientationMargin={0}>Παραβιάσεις</Divider>
+                <List
+                    size="large"
+                    bordered
+                    dataSource={data[0]?.description ?? []}
+                    renderItem={(item) => <List.Item>{item}</List.Item>}
+                />
+                </>
+            )}
         </>
     );
 }

@@ -7,6 +7,10 @@ export interface TimetablesGet {
     school: SchoolData;
 }
 
+export interface TimetablePost {
+    schoolId: string;
+}
+
 export interface SchoolData {
     name: string;
     maxHoursPerDay: number;

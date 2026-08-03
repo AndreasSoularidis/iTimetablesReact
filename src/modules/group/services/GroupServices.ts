@@ -3,8 +3,6 @@ import type { GroupEntity, GroupGet, GroupPost, GroupPut } from "../types";
 import { toast } from "react-toastify";
 import { useGroup, useGroups } from "../hooks/useGroup";
 
-
-
 async function getGroups(schoolId: string): Promise<Array<GroupEntity>> {
   try {
     const response = await axios.get<Array<GroupGet>>(
