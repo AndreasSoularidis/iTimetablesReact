@@ -29,7 +29,7 @@ async function insertTeaching(data: TeachingPost): Promise<TeachingDetails | und
     toast.error(
       "Σφάλμα κατά την αποθήκευση των στοιχείων."
     );
-    console.error("Error adding/editing teaching:", error);
+    
   }
 }
 

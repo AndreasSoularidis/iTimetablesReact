@@ -161,7 +161,8 @@ export default function AddEditTeaching({
     };
     try {
       const response = await TeachingService.insert(dataToSubmit);
-
+      if(response === undefined) return;
+      
       const newTeaching: Teaching= {
         key: `${response?.teacher.id}-${response?.course.id}`,
         schoolClass: { id: selectedSchoolClass?.id!, description: selectedSchoolClass?.name! },
