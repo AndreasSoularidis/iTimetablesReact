@@ -1,5 +1,5 @@
-import { Button, Descriptions, Divider, List, Space, Switch, Tag } from "antd";
-import { DownloadOutlined, ThunderboltFilled } from "@ant-design/icons";
+import { Button, Descriptions, Divider, Flex, List, Progress, Space, Switch, Tag } from "antd";
+import { DownloadOutlined, ThunderboltFilled, StopOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import TimeslotsTable from "../../../shared/TimeslotsTable/TimeslotsTable";
 import { useEffect, useState } from "react";
@@ -13,7 +13,7 @@ export default function Timetable() {
     const [details, setDetails] = useState<{ key: string; label: string; children: string }[]>([]);
     const [showViolations, setShowViolations] = useState<boolean>(true);
 
-    const { progress, isConnected, isProcessing, startProcessing } = useTimetableHub();
+    const { progress, isConnected, isProcessing, startProcessing, cancelProcessing } = useTimetableHub();
 
     const onChange = (checked: boolean) => {
         setShowViolations(checked);
@@ -32,6 +32,15 @@ export default function Timetable() {
             const msg = err?.message ?? "Σφάλμα κατά τη σύνδεση στο hub.";
             toast.error(msg);
             console.error("JoinTimetableGroup error:", err);
+        }
+    }
+
+    const handleCancel = async () => {
+        try {
+            await cancelProcessing();
+        } catch (err: any) {
+            toast.error(err?.message ?? "Σφάλμα κατά την ακύρωση.");
+            console.error("Cancel timetable generation error:", err);
         }
     }
 
@@ -74,10 +83,16 @@ export default function Timetable() {
                 style={{ fontSize: 16, padding: "0 16px" }}
                 >Eξαγωγή σε Excel</Button>
             </Space>
+            
             {isProcessing && progress && (
-                <div style={{ marginTop: 16 }}>
-                    <Tag color="processing">{progress.completionPercentage}%</Tag>
-                </div>
+                <Flex align="center" wrap gap={30}>
+                <Progress type="circle" percent={parseInt(progress.completionPercentage)} />
+                <Button
+                    danger
+                    icon={<StopOutlined />}
+                    onClick={handleCancel}
+                >Ακύρωση</Button>
+            </Flex>
             )}
             {data.length > 0 && ( 
                 <>

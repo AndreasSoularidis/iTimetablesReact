@@ -10,6 +10,7 @@ interface TimetableHubContextValue {
   isProcessing: boolean;
   activeTimetableId: string | null;
   startProcessing: (timetableId: string) => Promise<void>;
+  cancelProcessing: () => Promise<void>;
 }
 
 const TimetableHubContext = createContext<TimetableHubContextValue | null>(null);
@@ -76,8 +77,30 @@ export function TimetableHubProvider({ children }: { children: ReactNode }) {
     setIsProcessing(true);
   }, []);
 
+  // Requires a matching "CancelTimetableGeneration" hub method on the backend.
+  const cancelProcessing = useCallback(async () => {
+    const timetableId = activeTimetableIdRef.current;
+    if (!timetableId || connectionRef.current?.state !== signalR.HubConnectionState.Connected) return;
+
+    try {
+      await connectionRef.current.invoke("CancelTimetableGeneration", timetableId);
+    } catch (err) {
+      console.error("CancelTimetableGeneration error:", err);
+    } finally {
+      await connectionRef.current
+        .invoke("LeaveTimetableGroup", timetableId)
+        .catch((err) => console.error("LeaveTimetableGroup error:", err));
+      activeTimetableIdRef.current = null;
+      setActiveTimetableId(null);
+      setIsProcessing(false);
+      setProgress(null);
+    }
+  }, []);
+
   return (
-    <TimetableHubContext.Provider value={{ progress, isConnected, isProcessing, activeTimetableId, startProcessing }}>
+    <TimetableHubContext.Provider
+      value={{ progress, isConnected, isProcessing, activeTimetableId, startProcessing, cancelProcessing }}
+    >
       {children}
     </TimetableHubContext.Provider>
   );
