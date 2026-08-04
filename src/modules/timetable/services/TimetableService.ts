@@ -20,7 +20,7 @@ async function getTimetables(schoolId: string): Promise<Array<TimetableEntity>> 
 
 import type { TimetablePost } from "../types";
 
-async function createTimetable(data: TimetablePost): Promise<string | undefined> {
+async function createTimetable(data: TimetablePost): Promise<{id:string, status:number} | undefined> {
   try {
     const response = await axios.post(`http://localhost:5191/api/schools/timetables`, data);
     toast.success(

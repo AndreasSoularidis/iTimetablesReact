@@ -34,3 +34,8 @@ export interface TimetableEntity {
     timeslots: Teacher[][];
     school: SchoolData;
 }
+
+export interface ProgressMessage {
+    timetableId: string;
+    completionPercentage: string;
+}
