@@ -95,20 +95,24 @@ export default function Timetable() {
                     <Tag color="processing">{progress.completionPercentage}%</Tag>
                 </div>
             )}
-            {data.length > 0 && <TimeslotsTable timeslots={data[0].timeslots} hours={data[0].school.maxHoursPerDay} days={data[0].school.teachingDays} classes={data[0].school.schoolClasses} />}
-            <Descriptions title="" items={details} style={{ marginTop: 16 }} />
-            <Space style={{ marginTop: 16, marginBottom: 16 }}>
-                Εμφάνιση Παραβιάσεων: <Switch defaultChecked onChange={onChange} />
-            </Space>
-            {showViolations && (
+            {data.length > 0 && ( 
                 <>
-                <Divider orientation="start" orientationMargin={0}>Παραβιάσεις</Divider>
-                <List
-                    size="large"
-                    bordered
-                    dataSource={data[0]?.description ?? []}
-                    renderItem={(item) => <List.Item>{item}</List.Item>}
-                />
+                    <TimeslotsTable timeslots={data[0].timeslots} hours={data[0].school.maxHoursPerDay} days={data[0].school.teachingDays} classes={data[0].school.schoolClasses} />
+                    <Descriptions title="" items={details} style={{ marginTop: 16 }} />
+                    <Space style={{ marginTop: 16, marginBottom: 16 }}>
+                        Εμφάνιση Παραβιάσεων: <Switch defaultChecked onChange={onChange} />
+                    </Space>
+                    {showViolations && (
+                        <>
+                        <Divider orientation="start" orientationMargin={0}>Παραβιάσεις</Divider>
+                        <List
+                            size="large"
+                            bordered
+                            dataSource={data[0]?.description ?? []}
+                            renderItem={(item) => <List.Item>{item}</List.Item>}
+                        />
+                        </>
+                    )}
                 </>
             )}
         </>
