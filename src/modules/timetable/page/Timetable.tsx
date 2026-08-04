@@ -2,7 +2,7 @@ import { Button, Descriptions, Divider, List, Space, Switch, Tag } from "antd";
 import { DownloadOutlined, ThunderboltFilled } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import TimeslotsTable from "../../../shared/TimeslotsTable/TimeslotsTable";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { TimetableService } from "../services/TimetableService";
 import type { TimetableEntity, TimetablePost } from "../types";
 import { useTimetableHub } from "../hooks/useTimetableHub";
@@ -12,24 +12,12 @@ export default function Timetable() {
     const [data, setData] = useState<TimetableEntity[]>([]);
     const [details, setDetails] = useState<{ key: string; label: string; children: string }[]>([]);
     const [showViolations, setShowViolations] = useState<boolean>(true);
-    const [isProcessing, setIsProcessing] = useState<boolean>(false);
-    const activeTimetableId = useRef<string | null>(null);
 
-    const { progress, isConnected, joinGroup, leaveGroup } = useTimetableHub();
+    const { progress, isConnected, isProcessing, startProcessing } = useTimetableHub();
 
     const onChange = (checked: boolean) => {
         setShowViolations(checked);
     };
-
-    useEffect(() => {
-        if (!progress || !activeTimetableId.current) return;
-
-        if (progress.completionPercentage === "100") {
-            leaveGroup(activeTimetableId.current.toString());
-            activeTimetableId.current = null;
-            setIsProcessing(false);
-        }
-    }, [progress, leaveGroup]);
 
     const handleSubmit = async () => {
         const payload: TimetablePost = {
@@ -38,16 +26,12 @@ export default function Timetable() {
         const timetableId = await TimetableService.create(payload);
         if (!timetableId) return;
 
-        activeTimetableId.current = timetableId.id;
-        setIsProcessing(true);
         try {
-            await joinGroup(timetableId.id);
+            await startProcessing(timetableId.id);
         } catch (err: any) {
             const msg = err?.message ?? "Σφάλμα κατά τη σύνδεση στο hub.";
             toast.error(msg);
             console.error("JoinTimetableGroup error:", err);
-            activeTimetableId.current = null;
-            setIsProcessing(false);
         }
     }
 
