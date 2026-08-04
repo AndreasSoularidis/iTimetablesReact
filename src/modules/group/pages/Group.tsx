@@ -1,11 +1,14 @@
 import { App, Button, Card, Col, Divider, Row, Space } from "antd";
-import { EditOutlined, PlusOutlined, DeleteFilled, PlusCircleOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined, DeleteFilled } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { GroupService } from "../../group/services/GroupServices";
 import type { GroupEntity, GroupPost } from "../../group/types";
 import AddEditGroup from "../components/AddEditGroup";
+import {useTimetableHub} from "../../timetable/hooks/useTimetableHub";
+import { toast } from "react-toastify";
 
 export default function Group() {
+    const {isProcessing} = useTimetableHub();
     const { modal } = App.useApp();
     const [data, setData] = useState<GroupEntity[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
@@ -14,11 +17,19 @@ export default function Group() {
 
 
     const handleEdit = (group: GroupEntity) => {
+        if(isProcessing){
+            toast.error("Δεν μπορείτε να επεξεργαστείτε τμήματα ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
+            return;
+        }
         setSelectedGroup(group);
         setModalOpen(true);
     }
     
     const handleDelete = async (group: GroupEntity) => {
+        if(isProcessing){
+            toast.error("Δεν μπορείτε να διαγράψετε τμήματα ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
+            return;
+        }
         modal.confirm({
             title: "Επιβεβαίωση Διαγραφής",
             content: "Είστε σίγουροι ότι θέλετε να διαγράψετε το συγκεκριμένο τμήμα;",

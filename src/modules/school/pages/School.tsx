@@ -7,12 +7,15 @@ import {
   type CheckboxOptionType,
   type DescriptionsProps,
 } from "antd";
+import { useTimetableHub } from "../../timetable/hooks/useTimetableHub";
 import { useEffect, useState } from "react";
 import AddEditSchool from "../components/AddEditSchool";
 import type { ISchoolGet, ISchoolPost, ISchoolPut } from "../types";
 import { SchoolService } from "../services/SchoolService";
+import { toast } from "react-toastify";
 
 export default function School() {
+  const {isProcessing} = useTimetableHub();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<ISchoolGet>();
   const [items, setItems] = useState<DescriptionsProps["items"]>([]);
@@ -45,6 +48,10 @@ export default function School() {
   };
 
   const handleEdit = (record: ISchoolGet) => {
+    if(isProcessing){
+      toast.error("Δεν μπορείτε να επεξεργαστείτε τα στοιχεία της σχολικής μονάδας ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
+      return;
+    }
     setIsModalOpen(true);
     setEditingRecord(record);
   };

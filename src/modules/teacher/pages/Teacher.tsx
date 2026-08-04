@@ -7,9 +7,12 @@ import { TeacherService } from "../services/TeacherService";
 import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTable";
 import AddEditTeacher from "../components/AddEditTeacher";
 import type { TeacherPost } from "../types";
+import { useTimetableHub } from "../../timetable/hooks/useTimetableHub";
+import { toast } from "react-toastify";
 
 export default function Teacher() {
   const { modal } = App.useApp();
+  const {isProcessing} = useTimetableHub();
   const [data, setData] = useState<TeacherEntity[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherEntity | null>(null);
@@ -24,11 +27,19 @@ export default function Teacher() {
   }
 
   const handleEdit = (teacher: TeacherEntity) => {
+    if(isProcessing){
+      toast.error("Δεν μπορείτε να επεξεργαστείτε εκπαιδευτικούς ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
+      return; 
+    }
     setSelectedTeacher(teacher);
     setModalOpen(true);
   }
 
   const handleDelete = async (teacher: TeacherEntity) => {
+    if(isProcessing){
+      toast.error("Δεν μπορείτε να διαγράψετε εκπαιδευτικούς ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
+      return; 
+    }
     modal.confirm({
       title: "Επιβεβαίωση Διαγραφής",
       content: "Είστε σίγουροι ότι θέλετε να διαγράψετε τον εκπαιδευτικό;",
