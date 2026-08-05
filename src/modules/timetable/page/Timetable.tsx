@@ -80,6 +80,12 @@ export default function Timetable() {
                 type="primary"
                 size="large"
                 icon={<DownloadOutlined />}
+                onClick={() => {
+                    const payload: TimetablePost = {
+                        schoolId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"
+                    };
+                    TimetableService.export(payload);
+                }}
                 style={{ fontSize: 16, padding: "0 16px" }}
                 >Eξαγωγή σε Excel</Button>
             </Space>
