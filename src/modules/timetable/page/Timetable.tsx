@@ -13,7 +13,7 @@ export default function Timetable() {
     const [details, setDetails] = useState<{ key: string; label: string; children: string }[]>([]);
     const [showViolations, setShowViolations] = useState<boolean>(true);
 
-    const { progress, isConnected, isProcessing, startProcessing, cancelProcessing } = useTimetableHub();
+    const { progress, isConnected, isProcessing, isCompleted, startProcessing, cancelProcessing } = useTimetableHub();
 
     const onChange = (checked: boolean) => {
         setShowViolations(checked);
@@ -59,6 +59,24 @@ export default function Timetable() {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (!isCompleted) return;
+
+        const fetchData = async () => {
+            const response = await TimetableService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+            setData(response);
+            const status = response[0].feasible ? "Βέλτιστο" : "Μη Εφικτό";
+            const fitness = 100 - response[0].fitness;
+            setDetails([
+                { key: "1", label: "Κατάσταση", children: status },
+                { key: "2", label: "Βαθμολογία", children: fitness.toPrecision(4).toString() },
+                { key: "3", label: "Πλήθος Παραβιάσεων", children: response[0].description.length.toString() },
+            ]);
+        };
+
+        fetchData();
+    }, [isCompleted]);
     
     return (
         <>
@@ -76,31 +94,33 @@ export default function Timetable() {
                 >Δημιουργία</Button>
             </Space>
             <Space style={{ marginLeft: 16 }}>
+                {!isProcessing && data.length > 0 && (
                 <Button
-                type="primary"
-                size="large"
-                icon={<DownloadOutlined />}
-                onClick={() => {
-                    const payload: TimetablePost = {
-                        schoolId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"
-                    };
-                    TimetableService.export(payload);
-                }}
-                style={{ fontSize: 16, padding: "0 16px" }}
-                >Eξαγωγή σε Excel</Button>
+                    type="primary"
+                    size="large"
+                    icon={<DownloadOutlined />}
+                    onClick={() => {
+                        const payload: TimetablePost = {
+                            schoolId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"
+                        };
+                        TimetableService.export(payload);
+                    }}
+                    style={{ fontSize: 16, padding: "0 16px" }}
+                >Eξαγωγή σε Excel
+                </Button>)}
             </Space>
             
             {isProcessing && progress && (
                 <Flex align="center" wrap gap={30}>
-                <Progress type="circle" percent={parseInt(progress.completionPercentage)} />
+                <Progress type="circle" percent={progress.completionPercentage} />
                 <Button
                     danger
                     icon={<StopOutlined />}
                     onClick={handleCancel}
-                >Ακύρωση</Button>
+                >{isProcessing ? "Ακύρωση" : "Εμφάνιση"}</Button>
             </Flex>
             )}
-            {data.length > 0 && ( 
+            {!isProcessing && data.length > 0 && (
                 <>
                     <TimeslotsTable timeslots={data[0].timeslots} hours={data[0].school.maxHoursPerDay} days={data[0].school.teachingDays} classes={data[0].school.schoolClasses} />
                     <Descriptions title="" items={details} style={{ marginTop: 16 }} />

@@ -37,5 +37,6 @@ export interface TimetableEntity {
 
 export interface ProgressMessage {
     timetableId: string;
-    completionPercentage: string;
+    completionPercentage: number;
+    status: number;
 }

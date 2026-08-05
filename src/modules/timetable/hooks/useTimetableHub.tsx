@@ -8,6 +8,7 @@ interface TimetableHubContextValue {
   progress: ProgressMessage | null;
   isConnected: boolean;
   isProcessing: boolean;
+  isCompleted: boolean;
   activeTimetableId: string | null;
   startProcessing: (timetableId: string) => Promise<void>;
   cancelProcessing: () => Promise<void>;
@@ -22,6 +23,7 @@ export function TimetableHubProvider({ children }: { children: ReactNode }) {
   const [progress, setProgress] = useState<ProgressMessage | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [activeTimetableId, setActiveTimetableId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export function TimetableHubProvider({ children }: { children: ReactNode }) {
     connection.on("ReceiveProgress", (data: ProgressMessage) => {
       setProgress(data);
 
-      if (data.completionPercentage === "100" && activeTimetableIdRef.current) {
+      if (data.status === 2 && activeTimetableIdRef.current) {
         connection
           .invoke("LeaveTimetableGroup", activeTimetableIdRef.current)
           .catch((err) => console.error("LeaveTimetableGroup error:", err));
@@ -93,13 +95,14 @@ export function TimetableHubProvider({ children }: { children: ReactNode }) {
       activeTimetableIdRef.current = null;
       setActiveTimetableId(null);
       setIsProcessing(false);
+      setIsCompleted(false);
       setProgress(null);
     }
   }, []);
 
   return (
     <TimetableHubContext.Provider
-      value={{ progress, isConnected, isProcessing, activeTimetableId, startProcessing, cancelProcessing }}
+      value={{ progress, isConnected, isProcessing, isCompleted, activeTimetableId, startProcessing, cancelProcessing }}
     >
       {children}
     </TimetableHubContext.Provider>
