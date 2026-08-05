@@ -81,7 +81,13 @@ export default function Group() {
                     size="large"
                     icon={<PlusOutlined />}
                     style={{ fontSize: 16, padding: "0 16px" }}
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => {
+                        if (isProcessing) {
+                        toast.error("Δεν μπορείτε να προσθέσετε εκπαιδευτικό κατά τη δημιουργία του ωρολογίου προγράμματος.");
+                        return;
+                        }
+                        setModalOpen(true);
+                    }}
                 >
                     Προσθήκη
                 </Button>
