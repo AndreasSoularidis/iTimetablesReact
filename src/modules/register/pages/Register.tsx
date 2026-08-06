@@ -1,10 +1,12 @@
 import { Button, Flex, Form, Steps } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import ReviewData from "../components/ReviewData";
+import type { DirectorEntity, LookUp, SchoolUnitEntity } from "../types";
 import AddDirector from "../components/AddDirector";
 import AddSchoolUnit from "../components/AddSchoolUnit";
-import ReviewData from "../components/ReviewData";
-import type { DirectorEntity } from "../types";
+import axios from "axios";
+import { RegistrationService } from "../services/RegistrationService";
 
 const STEPS = [
     { title: "Προσωπικά Στοιχεία" },
@@ -16,7 +18,9 @@ export default function Register() {
     const [directorForm] = Form.useForm();
     const [schoolUnitForm] = Form.useForm();
     const [current, setCurrent] = useState(0);
+    const [schoolTypes, setSchoolTypes] = useState<LookUp[]>([]);
     const [directorData, setDirectorData] = useState<DirectorEntity | null>(null);
+    const [schoolUnitData, setSchoolUnitData] = useState<SchoolUnitEntity | null>(null);
 
     const isLast = current === STEPS.length - 1;
     const isFirst = current === 0;
@@ -36,19 +40,58 @@ export default function Register() {
         if (current === 1) {
             await schoolUnitForm.validateFields();
             const schoolUnitValues = schoolUnitForm.getFieldsValue();
+            const selectedSchoolType = schoolTypes.find(type => type.id === schoolUnitValues.schoolType);
+            setSchoolUnitData({
+                name: schoolUnitValues.schoolUnit,
+                schoolYear: schoolUnitValues.schoolYear,
+                teachingDays: schoolUnitValues.teachingDays,
+                maxHoursPerDay: schoolUnitValues.teachingHours,
+                morningZone: schoolUnitValues.availableZones?.includes("morningZone") ?? false,
+                afternoonZone: schoolUnitValues.availableZones?.includes("afternoonZone") ?? false,
+                extendedAfternoonZone: schoolUnitValues.availableZones?.includes("extendedAfternoonZone") ?? false,
+                schoolType: selectedSchoolType!,
+            });
         }
         if (isLast) {
-            // TODO: submit directorData + schoolUnitForm values to the registration API
-            return;
+            const dataToSubmit = {
+                director: directorData!,
+                schoolUnit: {
+                    name: schoolUnitData!.name,
+                    schoolYear: schoolUnitData!.schoolYear,
+                    teachingDays: schoolUnitData!.teachingDays,
+                    maxHoursPerDay: schoolUnitData!.maxHoursPerDay,
+                    morningZone: schoolUnitData!.morningZone,
+                    afternoonZone: schoolUnitData!.afternoonZone,
+                    extendedAfternoonZone: schoolUnitData!.extendedAfternoonZone,
+                    schoolTypeId: schoolUnitData!.schoolType.id,
+                },
+            };
+            await RegistrationService.insert(dataToSubmit);
+            setDirectorData(null);
+            setSchoolUnitData(null);
+            directorForm.resetFields();
+            schoolUnitForm.resetFields();
         }
         setCurrent((c) => c + 1);
     };
 
     const stepContent = [
         <AddDirector form={directorForm} />,
-        <AddSchoolUnit form={schoolUnitForm} />,
-        <ReviewData director={directorData!} schoolUnitForm={schoolUnitForm} />,
+        <AddSchoolUnit form={schoolUnitForm} schoolTypes={schoolTypes} />,
+        <ReviewData director={directorData!} schoolUnit={schoolUnitData} />,
     ];
+
+    useEffect(() => {
+        async function fetchSchoolTypes() {
+            try {
+                const response = await axios.get("http://localhost:5191/api/schoolTypes");
+                setSchoolTypes(response.data.schoolTypes);
+            } catch (error) {
+                console.error("Error fetching school types:", error);
+            }
+        }
+        fetchSchoolTypes();
+    }, []);
 
     return (
         <>

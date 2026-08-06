@@ -1,9 +1,7 @@
-import { Descriptions, Typography, type FormInstance } from "antd";
-import type { DirectorEntity } from "../types";
+import { Descriptions, Typography } from "antd";
+import type { DirectorEntity, SchoolUnitEntity } from "../types";
 
-export default function ReviewData({ director, schoolUnitForm }: { director: DirectorEntity | null; schoolUnitForm: FormInstance }) {
-    const schoolUnitValues = schoolUnitForm.getFieldsValue();
-
+export default function ReviewData({ director, schoolUnit }: { director: DirectorEntity | null; schoolUnit: SchoolUnitEntity | null }) {
     return (
         <div>
             <Typography.Title level={4}>Προσωπικά Στοιχεία</Typography.Title>
@@ -15,12 +13,14 @@ export default function ReviewData({ director, schoolUnitForm }: { director: Dir
             </Descriptions>
             <Typography.Title level={4}>Στοιχεία Σχολικής Μονάδας</Typography.Title>
             <Descriptions column={1} bordered size="small">
-              <Descriptions.Item label="Όνομα">{schoolUnitValues.schoolUnit}</Descriptions.Item>
-              <Descriptions.Item label="Βαθμίδα Εκπαίδευσης">{schoolUnitValues.schoolType}</Descriptions.Item>
-              <Descriptions.Item label="Σχολικό Έτος">{schoolUnitValues.schoolYear}</Descriptions.Item>
-              <Descriptions.Item label="Ημέρες Διδασκαλίας">{schoolUnitValues.teachingDays}</Descriptions.Item>
-              <Descriptions.Item label="Ώρες Λειτουργίας">{schoolUnitValues.teachingHours}</Descriptions.Item>
-              <Descriptions.Item label="Ολοήμερο Πρόγραμμα">{schoolUnitValues.availableZones}</Descriptions.Item>
+              <Descriptions.Item label="Όνομα">{schoolUnit?.name}</Descriptions.Item>
+              <Descriptions.Item label="Βαθμίδα Εκπαίδευσης">{schoolUnit?.schoolType.description ?? "-"}</Descriptions.Item>
+              <Descriptions.Item label="Σχολικό Έτος">{schoolUnit?.schoolYear ?? "-"}</Descriptions.Item>
+              <Descriptions.Item label="Ημέρες Διδασκαλίας/Εβδομάδα">{schoolUnit?.teachingDays ?? "-"}</Descriptions.Item>
+              <Descriptions.Item label="Μέγιστες Ώρες Διδασκαλίας/Ημέρα">{schoolUnit?.maxHoursPerDay ?? "-"}</Descriptions.Item>
+              <Descriptions.Item label="Πρωινή Ζώνη">{schoolUnit?.morningZone ? "Ναι" : "Όχι"}</Descriptions.Item>
+              <Descriptions.Item label="Ολοήμερο">{schoolUnit?.afternoonZone ? "Ναι" : "Όχι"}</Descriptions.Item>
+              <Descriptions.Item label="Διευρυμένο Ολοήμερο">{schoolUnit?.extendedAfternoonZone ? "Ναι" : "Όχι"}</Descriptions.Item>
             </Descriptions>
         </div>
     );
