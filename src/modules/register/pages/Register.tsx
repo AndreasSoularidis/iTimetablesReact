@@ -4,6 +4,7 @@ import { useState } from "react";
 import AddDirector from "../components/AddDirector";
 import AddSchoolUnit from "../components/AddSchoolUnit";
 import ReviewData from "../components/ReviewData";
+import type { DirectorEntity } from "../types";
 
 const STEPS = [
     { title: "Προσωπικά Στοιχεία" },
@@ -15,19 +16,29 @@ export default function Register() {
     const [directorForm] = Form.useForm();
     const [schoolUnitForm] = Form.useForm();
     const [current, setCurrent] = useState(0);
+    const [directorData, setDirectorData] = useState<DirectorEntity | null>(null);
 
     const isLast = current === STEPS.length - 1;
     const isFirst = current === 0;
 
     const handleNext = async () => {
-        if (current === 0) await directorForm.validateFields();
-        if (current === 1) await schoolUnitForm.validateFields();
-
-        if (isLast) {
+        if (current === 0) {
+            await directorForm.validateFields();
             const directorValues = directorForm.getFieldsValue();
+            setDirectorData({
+                firstName: directorValues.firstName,
+                lastName: directorValues.lastName,
+                username: directorValues.username,
+                email: directorValues.email,
+                password: directorValues.password,
+            });
+        }
+        if (current === 1) {
+            await schoolUnitForm.validateFields();
             const schoolUnitValues = schoolUnitForm.getFieldsValue();
-            console.log("Director Values:", directorValues);
-            console.log("School Unit Values:", schoolUnitValues);
+        }
+        if (isLast) {
+            // TODO: submit directorData + schoolUnitForm values to the registration API
             return;
         }
         setCurrent((c) => c + 1);
@@ -36,7 +47,7 @@ export default function Register() {
     const stepContent = [
         <AddDirector form={directorForm} />,
         <AddSchoolUnit form={schoolUnitForm} />,
-        <ReviewData directorForm={directorForm} schoolUnitForm={schoolUnitForm} />,
+        <ReviewData director={directorData!} schoolUnitForm={schoolUnitForm} />,
     ];
 
     return (

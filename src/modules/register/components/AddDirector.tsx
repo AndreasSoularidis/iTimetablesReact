@@ -22,9 +22,23 @@ export default function AddDirector( { form }: { form: FormInstance }) {
             <Input />
           </Form.Item>
         </Form.Item>
-        <Form.Item label="Email" name="email">
-            <Input type="email" autoComplete="username" />
-        </Form.Item>
+        <Form.Item style={{ marginBottom: 0 }}>
+          <Form.Item 
+            label="Email" 
+            name="email" 
+            style={{ display: "inline-block", width: "calc(50% - 8px)", marginRight: 16 }}
+            >
+              <Input type="email" autoComplete="username" />
+          </Form.Item>
+          <Form.Item
+              name="username"
+              label="username"
+              rules={[{ required: true, message: "Παρακαλώ εισάγετε το username" }]}
+              style={{ display: "inline-block", width: "calc(50% - 8px)" }}
+            >
+              <Input />
+            </Form.Item>
+          </Form.Item>
         <Form.Item style={{ marginBottom: 0 }}>
           <Form.Item
             name="password"
