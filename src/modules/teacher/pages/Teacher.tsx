@@ -169,7 +169,7 @@ export default function Teacher() {
       >
         {selectedTeacher && (
           <>
-            <Descriptions column={1} bordered size="small" styles={{ label: { width: 160 } }}>
+            <Descriptions column={1} bordered size="small" style={{ label: { width: 160 } }}>
               <Descriptions.Item label="Όνοματεπώνυμο">{selectedTeacher.name}</Descriptions.Item>
               <Descriptions.Item label="Συντ/φια">{selectedTeacher.short}</Descriptions.Item>
               <Descriptions.Item label="Ειδικότητα">{selectedTeacher.specialty}</Descriptions.Item>

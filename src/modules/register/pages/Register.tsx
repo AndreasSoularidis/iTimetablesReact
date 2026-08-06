@@ -1,65 +1,66 @@
-import { Button, Flex, Tabs, type TabsProps } from "antd";
+import { Button, Flex, Form, Steps } from "antd";
+import { useState } from "react";
 
 import AddDirector from "../components/AddDirector";
 import AddSchoolUnit from "../components/AddSchoolUnit";
-import { Form } from "antd";
-import { useEffect, useState } from "react";
+import ReviewData from "../components/ReviewData";
+
+const STEPS = [
+    { title: "Προσωπικά Στοιχεία" },
+    { title: "Στοιχεία Σχολικής Μονάδας" },
+    { title: "Ολοκλήρωση" },
+];
 
 export default function Register() {
     const [directorForm] = Form.useForm();
     const [schoolUnitForm] = Form.useForm();
-    const [activeTab, setActiveTab] = useState<string>("1");
+    const [current, setCurrent] = useState(0);
 
-    const buttonTitle = activeTab === "1" ? "Επόμενο" : "Εγγραφή";
+    const isLast = current === STEPS.length - 1;
+    const isFirst = current === 0;
 
-    const handleClick = () => {
-        if(activeTab === "1") {
-            setActiveTab("2");
+    const handleNext = async () => {
+        if (current === 0) await directorForm.validateFields();
+        if (current === 1) await schoolUnitForm.validateFields();
+
+        if (isLast) {
+            const directorValues = directorForm.getFieldsValue();
+            const schoolUnitValues = schoolUnitForm.getFieldsValue();
+            console.log("Director Values:", directorValues);
+            console.log("School Unit Values:", schoolUnitValues);
             return;
         }
-        // Handle form submission logic here
-        const directorValues = directorForm.getFieldsValue();
-        const schoolUnitValues = schoolUnitForm.getFieldsValue();
-        console.log("Director Values:", directorValues);
-        console.log("School Unit Values:", schoolUnitValues);
-    }
-
-    const onChange = (key: string) => {
-        console.log(key);
+        setCurrent((c) => c + 1);
     };
 
-
-    const items: TabsProps['items'] = [
-        {
-            key: '1',
-            label: 'Προσωπικά Στοιχεία',
-            children: <AddDirector form={directorForm}/>,
-        },
-        {
-            key: '2',
-            label: 'Στοιχεία Σχολικής Μονάδας',
-            children: <AddSchoolUnit form={schoolUnitForm}/>,
-        },
+    const stepContent = [
+        <AddDirector form={directorForm} />,
+        <AddSchoolUnit form={schoolUnitForm} />,
+        <ReviewData directorForm={directorForm} schoolUnitForm={schoolUnitForm} />,
     ];
+
     return (
         <>
-        <h1>Registration Form</h1>
-        <Tabs defaultActiveKey="1" activeKey={activeTab} items={items} onChange={onChange} />
-        <Flex justify="flex-end" style={{ marginTop: 8 }}>
-            <Button   
-              type="primary" 
-              size="middle" 
-              onClick={() => {
-                activeTab === "2" ? setActiveTab("1") : null;
-              }}>
-              {"Προηγούμενο"}
-          </Button>
-          <Button   
-            type="primary" 
-            size="middle" 
-            onClick={handleClick}>{buttonTitle}
-          </Button>
-        </Flex> 
+            <h1>Registration Form</h1>
+            <Steps current={current} items={STEPS} style={{ marginBottom: 24 }} />
+            {/* All steps stay mounted so antd keeps field values registered in the form store */}
+            <div style={{ minHeight: 200 }}>
+                {stepContent.map((content, index) => (
+                    <div key={index} style={{ display: index === current ? "block" : "none" }}>
+                        {content}
+                    </div>
+                ))}
+            </div>
+            <Flex justify="flex-end" gap={8} style={{ marginTop: 16 }}>
+                {!isFirst && (
+                    <Button size="middle" onClick={() => setCurrent((c) => c - 1)}>
+                        Προηγούμενο
+                    </Button>
+                )}
+                <Button type="primary" size="middle" onClick={handleNext}>
+                    {isLast ? "Εγγραφή" : "Επόμενο"}
+                </Button>
+            </Flex>
         </>
     );
 }
