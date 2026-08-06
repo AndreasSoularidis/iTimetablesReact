@@ -4,6 +4,9 @@ import AddEditTeaching from "../components/AddEditTeaching";
 import { useEffect, useState } from "react";
 import type { TeachingEntity } from "../types";
 import { TeachingService } from "../services/TeachingService";
+import { useTimetableHub } from "../../timetable/hooks/useTimetableHub";
+import { toast } from "react-toastify";
+
 
 export default function Teaching() {
   const [data, setData] = useState<TeachingEntity[]>([]);
@@ -11,12 +14,22 @@ export default function Teaching() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTeaching, setSelectedTeaching] = useState<TeachingEntity | null>(null);
+  const {isProcessing} = useTimetableHub();
 
   const handleTeachingSubmit = () => {
     setIsModalOpen(false);
     setSelectedTeaching(null);
     setReloadData(true);
   };
+
+  const handleOpenModal = (teaching: TeachingEntity | null) => {
+    if(isProcessing) {
+      toast.error("Δεν μπορείτε να τροποποιήσετε τις διδασκαλίες ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
+      return;
+    }
+    setSelectedTeaching(teaching);
+    setIsModalOpen(true);
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +39,6 @@ export default function Teaching() {
     fetchData();
     setReloadData(false);
   }, [reloadData]);
-
 
   return (
     <>
@@ -38,7 +50,7 @@ export default function Teaching() {
             size="large"
             icon={<PlusOutlined />}
             style={{ fontSize: 16, padding: "0 16px" }}
-            onClick={() => { setIsModalOpen(true); setSelectedTeaching(null); }}
+            onClick={() => handleOpenModal(null)}
         >
             Προσθήκη
         </Button>
@@ -47,7 +59,7 @@ export default function Teaching() {
         {data.map((group) => {
           const actions: React.ReactNode[] = [
               <EyeFilled key="show" onClick={() => { setDrawerOpen(true); setSelectedTeaching(group); }} />,
-              <PlusCircleOutlined key="addTeaching" onClick={() => { setIsModalOpen(true); setSelectedTeaching(group); }} />
+              <PlusCircleOutlined key="addTeaching" onClick={() => handleOpenModal(group)} />
           ];
           
           return (

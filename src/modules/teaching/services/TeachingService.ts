@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Course, GradeCourses, TeachingDelete, TeachingDetails, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
+import type { GradeCourses, TeachingDelete, TeachingDetails, TeachingEntity, TeachingPost, TeachingsGet } from "../types";
 import { toast } from "react-toastify";
 import { useTeachings } from "../hooks/useTeaching";
 
