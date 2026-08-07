@@ -1,10 +1,14 @@
-import { Form, Input, Button, Checkbox } from "antd";
+import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Flex } from "antd";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import Register from "./Register";
 
 
 export default function LoginForm() {
+  const [registerOpen, setRegisterOpen] = useState(false);
+
   const onFinish = (values: any) => {
     console.log('Received values of form: ', values);
   }
@@ -40,9 +44,10 @@ export default function LoginForm() {
           <Button block type="primary" htmlType="submit">
             Σύνδεση
           </Button>
-          ή <Link to="/register">Εγγραφή τώρα!</Link>
+          ή <Button type="link" style={{ padding: 0 }} onClick={() => setRegisterOpen(true)}>Εγγραφή τώρα!</Button>
         </Form.Item>
       </Form>
+      <Register open={registerOpen} onClose={() => setRegisterOpen(false)} />
     </div>
   );
 } 

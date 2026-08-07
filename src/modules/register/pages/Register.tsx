@@ -1,4 +1,4 @@
-import { Button, Flex, Form, Steps } from "antd";
+import { Button, Flex, Form, Modal, Steps } from "antd";
 import { useEffect, useState } from "react";
 
 import ReviewData from "../components/ReviewData";
@@ -14,17 +14,20 @@ const STEPS = [
     { title: "Ολοκλήρωση" },
 ];
 
-export default function Register() {
+interface RegisterProps {
+    open: boolean;
+    onClose: () => void;
+}
+
+export default function Register({ open, onClose }: RegisterProps) {
     const [directorForm] = Form.useForm();
     const [schoolUnitForm] = Form.useForm();
     const [current, setCurrent] = useState(0);
     const [schoolTypes, setSchoolTypes] = useState<LookUp[]>([]);
     const [directorData, setDirectorData] = useState<DirectorEntity | null>(null);
     const [schoolUnitData, setSchoolUnitData] = useState<SchoolUnitEntity | null>(null);
-
     const isLast = current === STEPS.length - 1;
     const isFirst = current === 0;
-
     const handleNext = async () => {
         if (current === 0) {
             await directorForm.validateFields();
@@ -71,6 +74,9 @@ export default function Register() {
             setSchoolUnitData(null);
             directorForm.resetFields();
             schoolUnitForm.resetFields();
+            setCurrent(0);
+            onClose();
+            return;
         }
         setCurrent((c) => c + 1);
     };
@@ -94,8 +100,14 @@ export default function Register() {
     }, []);
 
     return (
-        <>
-            <h1>Registration Form</h1>
+        <Modal
+            open={open}
+            onCancel={onClose}
+            footer={null}
+            closable={true}
+            width={900}
+        >
+            <h1>Εγγραφή Νέου Χρήστη</h1>
             <Steps current={current} items={STEPS} style={{ marginBottom: 24 }} />
             {/* All steps stay mounted so antd keeps field values registered in the form store */}
             <div style={{ minHeight: 200 }}>
@@ -115,6 +127,6 @@ export default function Register() {
                     {isLast ? "Εγγραφή" : "Επόμενο"}
                 </Button>
             </Flex>
-        </>
+        </Modal>
     );
 }
