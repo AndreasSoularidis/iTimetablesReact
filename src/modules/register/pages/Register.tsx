@@ -28,10 +28,12 @@ export default function Register({ open, onClose }: RegisterProps) {
     const [schoolUnitData, setSchoolUnitData] = useState<SchoolUnitEntity | null>(null);
     const isLast = current === STEPS.length - 1;
     const isFirst = current === 0;
+
     const handleNext = async () => {
         if (current === 0) {
             await directorForm.validateFields();
             const directorValues = directorForm.getFieldsValue();
+
             setDirectorData({
                 firstName: directorValues.firstName,
                 lastName: directorValues.lastName,
