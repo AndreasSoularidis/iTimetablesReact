@@ -6,6 +6,7 @@ import Groups from '../modules/group/pages/Group';
 import Timetable from '../modules/timetable/page/Timetable';
 import Teaching from '../modules/teaching/page/Teaching';
 import Register from '../modules/register/pages/Register';
+import LoginForm from '../modules/register/pages/LoginForm';
 
 
 export default function AppRoutes() {
@@ -18,6 +19,7 @@ export default function AppRoutes() {
       <Route path="/teachings" element={<Teaching />} />
       <Route path="/timetables" element={<Timetable />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<LoginForm />} />
     </Routes>
   );
 }

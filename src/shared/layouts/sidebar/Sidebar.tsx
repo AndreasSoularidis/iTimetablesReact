@@ -71,8 +71,8 @@ export default function Sidebar() {
       key: "register",
       icon: <FontAwesomeIcon icon={faCalendarWeek} />,
       label: (
-        <NavLink to="/register">
-          Εγγραφή
+        <NavLink to="/login">
+          Σύνδεση
         </NavLink>
       ),
     }
