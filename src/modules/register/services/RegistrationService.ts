@@ -1,11 +1,11 @@
-import axios from "axios";
 import { toast } from "react-toastify";
-import type { newDirectorAndSchoolUnitPost } from "../types";
+import type { LoginRequest, LoginResponse, newDirectorAndSchoolUnitPost } from "../types";
+import axiosInstance, { setTokens } from "../../../shared/api/axiosInstance";
 
 
 async function createDirectorAndSchool(data: newDirectorAndSchoolUnitPost) {
   try {
-    await axios.post(`http://localhost:5191/api/users`, data);
+    await axiosInstance.post(`/users`, data);
     toast.success(
       "Τα στοιχεία του διευθυντή και της σχολικής μονάδας αποθηκεύτηκαν με επιτυχία!"
     );
@@ -15,6 +15,18 @@ async function createDirectorAndSchool(data: newDirectorAndSchoolUnitPost) {
       "Σφάλμα κατά την αποθήκευση των στοιχείων του διευθυντή και της σχολικής μονάδας."
     );
     console.error("Error adding/editing director and school unit:", error);
+  }
+}
+
+async function login(data: LoginRequest): Promise<LoginResponse | undefined> {
+  try {
+    const response = await axiosInstance.post<LoginResponse>(`/users/login`, data);
+    const { accessToken, refreshToken } = response.data;
+    setTokens(accessToken, refreshToken);
+    return response.data;
+  } catch (error) {
+    toast.error("Σφάλμα κατά τη σύνδεση.");
+    console.error("Error logging in:", error);
   }
 }
 
@@ -44,4 +56,5 @@ async function createDirectorAndSchool(data: newDirectorAndSchoolUnitPost) {
 
 export const RegistrationService = {
   insert: createDirectorAndSchool,
+  login: login,
 };

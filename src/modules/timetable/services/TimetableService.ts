@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "../../../shared/api/axiosInstance";
 import type { TimetableEntity, TimetablesGet } from "../types";
 import { toast } from "react-toastify";
 import { useTimetables } from "../hooks/useTimetable";
@@ -6,7 +6,7 @@ import { useTimetables } from "../hooks/useTimetable";
 
 async function getTimetables(schoolId: string): Promise<Array<TimetableEntity>> {
   try {
-    const response = await axios.get<Array<TimetablesGet>>(
+    const response = await axiosInstance.get<Array<TimetablesGet>>(
       `http://localhost:5191/api/schools/${schoolId}/timetables`
     );
 
@@ -22,7 +22,7 @@ import type { TimetablePost } from "../types";
 
 async function createTimetable(data: TimetablePost): Promise<{id:string, status:number} | undefined> {
   try {
-    const response = await axios.post(`http://localhost:5191/api/schools/timetables`, data);
+    const response = await axiosInstance.post(`http://localhost:5191/api/schools/timetables`, data);
     toast.success(
       "Η δημιουργία του ωρολογίου προγράμματος βρίσκεται σε εξέλιξη!"
     );
@@ -38,7 +38,7 @@ async function createTimetable(data: TimetablePost): Promise<{id:string, status:
 
 async function exportToExcel(data: TimetablePost): Promise<void> {
   try {
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       `http://localhost:5191/api/schools/timetables/export`, 
       data,
       {responseType: 'blob'}

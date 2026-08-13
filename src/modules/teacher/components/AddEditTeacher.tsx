@@ -12,6 +12,7 @@ import axios from "axios";
 import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTable";
 import type { TeacherEntity, TeacherPost, Specialty } from "../types";
 import { toast } from "react-toastify";
+import axiosInstance from "../../../shared/api/axiosInstance";
 
 const initialAvailability: number[][] = [
     [0, 0, 0, 0, 0, 0],
@@ -109,7 +110,7 @@ export default function AddEditTeacher({
 
     async function fetchTeacherSpecialties() {
       try {
-        const response = await axios.get("http://localhost:5191/api/specialties");
+        const response = await axiosInstance.get("/specialties");
         const data  = response.data.specialties.sort((a: { code: string; title: string }, b: { code: string; title: string }) =>
               a.code.localeCompare(b.code)
             );

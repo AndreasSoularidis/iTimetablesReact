@@ -1,13 +1,11 @@
-import axios from "axios";
+import axiosInstance from "../../../shared/api/axiosInstance";
 import type { TeacherEntity, TeacherGet, TeacherPost, TeacherPut } from "../types";
 import { toast } from "react-toastify";
 import { useTeachers } from "../hooks/useTeacher";
 
-async function getTeachers(schoolId: string): Promise<Array<TeacherEntity>> {
+async function getTeachers(): Promise<Array<TeacherEntity>> {
   try {
-    const response = await axios.get<Array<TeacherGet>>(
-      `http://localhost:5191/api/schools/${schoolId}/teachers`
-    );
+    const response = await axiosInstance.get<Array<TeacherGet>>("/schools/teachers");
 
     return useTeachers(response.data);
   } catch (error) {
@@ -19,7 +17,7 @@ async function getTeachers(schoolId: string): Promise<Array<TeacherEntity>> {
 
 async function insertTeacher(data: TeacherPost) {
   try {
-    await axios.post(`http://localhost:5191/api/schools/${data.schoolUnitId}/teachers`, data);
+    await axiosInstance.post("/schools/teachers", data);
     toast.success(
       "Τα στοιχεία του εκπαιδευτικού αποθηκεύτηκαν με επιτυχία!"
     );
@@ -34,7 +32,7 @@ async function insertTeacher(data: TeacherPost) {
 
 async function updateTeacher(teacher: TeacherPut){
   try{
-    await axios.put(`http://localhost:5191/api/schools/${teacher.schoolUnitId}/teachers`, teacher);
+    await axiosInstance.put(`/schools/teachers`, teacher);
     toast.success("Τα στοιχεία του εκπαιδευτικού ενημερώθηκαν με επιτυχία!");
   }catch(error){
     console.error("Error updating teacher:", error);
@@ -48,7 +46,7 @@ async function deleteTeacher(teacher: TeacherEntity) {
     if (teacherId === undefined) {
       return;
     }
-    await axios.delete(`http://localhost:5191/api/schools/${teacher.schoolUnitId}/teachers/${teacherId}`);
+    await axiosInstance.delete(`/schools/teachers/${teacherId}`);
     toast.success("Ο εκπαιδευτικός διαγράφηκε με επιτυχία!");
   } catch (error) {
     console.error(error);

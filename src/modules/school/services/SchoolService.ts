@@ -1,10 +1,10 @@
-import axios from "axios";
+import axiosInstance from "../../../shared/api/axiosInstance";
 import type { ISchoolGet, ISchoolPost, ISchoolPut } from "../types";
 import { toast } from "react-toastify";
 
 async function getSchoolData(managerId: string): Promise<ISchoolGet | null> {
   try {
-    const response = await axios.get(
+    const response = await axiosInstance.get(
       `http://localhost:5191/api/schools/${managerId}`
     );
     return response.data;
@@ -16,7 +16,7 @@ async function getSchoolData(managerId: string): Promise<ISchoolGet | null> {
 
 async function insertSchoolData(data: ISchoolPost) {
   try {
-    await axios.post("http://localhost:5191/api/schools/", data);
+    await axiosInstance.post("http://localhost:5191/api/schools/", data);
     toast.success(
       "Τα στοιχεία της σχολικής μονάδας αποθηκεύτηκαν με επιτυχία!"
     );
@@ -31,7 +31,7 @@ async function insertSchoolData(data: ISchoolPost) {
 
 async function updateSchoolUnit(schoolUnit: ISchoolPut){
   try{
-    await axios.put(`http://localhost:5191/api/schools/${schoolUnit.id}`, schoolUnit);
+    await axiosInstance.put(`http://localhost:5191/api/schools/${schoolUnit.id}`, schoolUnit);
     toast.success("Τα στοιχεία της σχολικής μονάδας ενημερώθηκαν με επιτυχία!");
   }catch(error){
     console.error("Error updating school unit:", error);

@@ -1,32 +1,46 @@
 import { Form, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Flex } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Register from "./Register";
+import { RegistrationService } from "../services/RegistrationService";
 
 
 export default function LoginForm() {
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-  const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
-  }
+  const handleLogin = async () => {
+    form.validateFields().then(async (values) => {
+      const loginData = {
+        email: values.email,
+        password: values.password,
+      };
+      const result = await RegistrationService.login(loginData);
+      if (result) {
+        navigate("/");
+      }
+    });
+  };
   return (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "70vh" }}>
       <h1 style={{ textAlign: "center", marginBottom: 24 }}>Σύνδεση</h1>
       <Form
         name="login"
+        form={form}
         initialValues={{ remember: true }}
         style={{ width: 500, height: "auto", border: "1px solid #f0f0f0", padding: 24, borderRadius: 8, boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)" }}
-        onFinish={onFinish}
       >
         <Form.Item
-          name="username"
-
-          rules={[{ required: true, message: 'Παρακαλώ εισάγετε το Όνομα Χρήστη!' }]}
+          name="email"
+          rules={[
+            { required: true, message: 'Παρακαλώ εισάγετε το email!' },
+            { type: 'email', message: 'Παρακαλώ εισάγετε ένα έγκυρο email!' }
+          ]}
         >
-          <Input prefix={<UserOutlined />} placeholder="Όνομα Χρήστη" autoComplete="off" />
+          <Input prefix={<UserOutlined />} placeholder="Email" autoComplete="off" />
         </Form.Item>
         <Form.Item
           name="password"
@@ -41,7 +55,7 @@ export default function LoginForm() {
         </Form.Item>
 
         <Form.Item>
-          <Button block type="primary" htmlType="submit">
+          <Button block type="primary" onClick={handleLogin} htmlType="submit">
             Σύνδεση
           </Button>
           ή <Button type="link" style={{ padding: 0 }} onClick={() => setRegisterOpen(true)}>Εγγραφή τώρα!</Button>
