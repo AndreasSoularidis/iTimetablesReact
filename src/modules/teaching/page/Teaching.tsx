@@ -84,7 +84,7 @@ export default function Teaching() {
       >
         {selectedTeaching && (
           <>
-            <Descriptions column={1} bordered size="small" styles={{ label: { width: 160 } }}>
+            <Descriptions column={1} bordered size="small" style={{ label: { width: 160 } }}>
               <Descriptions.Item label="Τμήμα">{selectedTeaching.name}</Descriptions.Item>
               <Descriptions.Item label="Υποχρεωτικές Ώρες Διδασκαλίας">{selectedTeaching.teachingHours}</Descriptions.Item>
               <Descriptions.Item label="Δηλωμένες Ώρες Διδασκαλίας">{selectedTeaching.assignedTeachingHours}</Descriptions.Item>

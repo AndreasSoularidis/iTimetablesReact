@@ -1,4 +1,4 @@
-import { Button, Descriptions, Divider, Flex, List, Progress, Space, Switch, Tag } from "antd";
+import { Button, Descriptions, Divider, Flex, List, Progress, Space, Switch } from "antd";
 import { DownloadOutlined, ThunderboltFilled, StopOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import TimeslotsTable from "../../../shared/TimeslotsTable/TimeslotsTable";

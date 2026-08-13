@@ -67,6 +67,15 @@ export default function Sidebar() {
         </NavLink>
       ),
     },
+    {
+      key: "register",
+      icon: <FontAwesomeIcon icon={faCalendarWeek} />,
+      label: (
+        <NavLink to="/login">
+          Σύνδεση
+        </NavLink>
+      ),
+    }
   ];
   return (
     <Sider width={230}>
