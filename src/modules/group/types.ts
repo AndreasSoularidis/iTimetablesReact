@@ -1,4 +1,4 @@
-export interface GroupGet {
+export interface ISchoolClassResponse {
     id: string;
     name: string;
     totalHours: number;
@@ -14,7 +14,7 @@ export interface LookUp {
     description: string;
 }
 
-export interface GroupPost {
+export interface ISchoolClassCreateRequest {
     name: string;
     totalHours: number;
     short: string;
@@ -23,7 +23,7 @@ export interface GroupPost {
     schoolUnitId: string;
 }
 
-export interface GroupPut {
+export interface ISchoolClassUpdateRequest {
     id: string;
     name: string;
     totalHours: number;
@@ -34,7 +34,7 @@ export interface GroupPut {
     schoolUnitId: string;
 }
 
-export interface GroupEntity {
+export interface SchoolClassEntity {
     key: string;
     name: string;
     totalHours: number;
