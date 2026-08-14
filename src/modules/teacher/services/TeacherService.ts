@@ -1,11 +1,11 @@
 import axiosInstance from "../../../shared/api/axiosInstance";
-import type { TeacherEntity, TeacherGet, TeacherPost, TeacherPut } from "../types";
+import type { TeacherEntity, ITeacherResponse, ITeacherCreateRequest, ITeacherUpdateRequest } from "../types";
 import { toast } from "react-toastify";
 import { useTeachers } from "../hooks/useTeacher";
 
 async function getTeachers(): Promise<Array<TeacherEntity>> {
   try {
-    const response = await axiosInstance.get<Array<TeacherGet>>("/schools/teachers");
+    const response = await axiosInstance.get<Array<ITeacherResponse>>("/schools/teachers");
 
     return useTeachers(response.data);
   } catch (error) {
@@ -15,7 +15,7 @@ async function getTeachers(): Promise<Array<TeacherEntity>> {
   }
 }
 
-async function insertTeacher(data: TeacherPost) {
+async function insertTeacher(data: ITeacherCreateRequest) {
   try {
     await axiosInstance.post("/schools/teachers", data);
     toast.success(
@@ -30,9 +30,9 @@ async function insertTeacher(data: TeacherPost) {
   }
 }
 
-async function updateTeacher(teacher: TeacherPut){
+async function updateTeacher(teacher: ITeacherUpdateRequest){
   try{
-    await axiosInstance.put(`/schools/teachers`, teacher);
+    await axiosInstance.put(`/schools/teachers/${teacher.id}`, teacher);
     toast.success("Τα στοιχεία του εκπαιδευτικού ενημερώθηκαν με επιτυχία!");
   }catch(error){
     console.error("Error updating teacher:", error);

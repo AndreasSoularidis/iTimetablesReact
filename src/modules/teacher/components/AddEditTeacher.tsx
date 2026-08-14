@@ -8,9 +8,8 @@ import {
   Slider,
 } from "antd";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTable";
-import type { TeacherEntity, TeacherPost, Specialty } from "../types";
+import type { TeacherEntity, ITeacherCreateRequest, Specialty, ITeacherUpdateRequest } from "../types";
 import { toast } from "react-toastify";
 import axiosInstance from "../../../shared/api/axiosInstance";
 
@@ -26,7 +25,7 @@ interface IProps {
   isModalOpen: boolean;
   modifyIsModalOpen: (value: boolean) => void;
   defaultEditValues: TeacherEntity | undefined;
-  onSubmit: (teacher: TeacherPost) => Promise<void>;
+  onSubmit: (teacher: ITeacherCreateRequest | ITeacherUpdateRequest) => Promise<void>;
 }
 
 export default function AddEditTeacher({
@@ -67,7 +66,7 @@ export default function AddEditTeacher({
   const handleOk = async () => {
     form.validateFields()
     .then(async (values) => {
-      const dataToSubmit: TeacherPost = {
+      let dataToSubmit: ITeacherCreateRequest = {
         firstName: values.firstName,
         lastName: values.lastName,
         short: `${values.firstName.charAt(0)}${values.lastName.charAt(0)}`,

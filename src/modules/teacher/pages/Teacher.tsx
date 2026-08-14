@@ -2,11 +2,10 @@ import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, App 
 import { PlusOutlined, DeleteFilled, EditFilled  } from "@ant-design/icons";
 import type { TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
-import type { TeacherEntity } from "../types";
+import type { ITeacherCreateRequest, ITeacherUpdateRequest, TeacherEntity } from "../types";
 import { TeacherService } from "../services/TeacherService";
 import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTable";
 import AddEditTeacher from "../components/AddEditTeacher";
-import type { TeacherPost } from "../types";
 import { useTimetableHub } from "../../timetable/hooks/useTimetableHub";
 import { toast } from "react-toastify";
 
@@ -55,11 +54,10 @@ export default function Teacher() {
   }
 
 
-  const handleSubmit = async (teacher: TeacherPost) => {
+  const handleSubmit = async (teacher: ITeacherCreateRequest | ITeacherUpdateRequest) => {
     try{
       if(selectedTeacher){
-        const teacherToUpdate = { ...teacher, id: selectedTeacher.key };
-        console.log("Updating teacher:", teacherToUpdate);
+        const teacherToUpdate = { ...teacher, id: selectedTeacher.key, assignedTeachingHours: selectedTeacher.assignedTeachingHours } as ITeacherUpdateRequest;
         await TeacherService.update(teacherToUpdate);
       }else{
         await TeacherService.insert(teacher);
@@ -72,7 +70,7 @@ export default function Teacher() {
     setSelectedTeacher(null);
   };
 
-  const renderActions = (value: any, record: TeacherEntity, index: number) => {
+  const renderActions = (record: TeacherEntity) => {
     return (
       <Space>
         <Tooltip placement="topLeft" title="Επεξεργασία">
@@ -113,13 +111,13 @@ export default function Teacher() {
       dataIndex: '',
       key: 'x',
       align: 'center',
-      render: (_: any, record: TeacherEntity) => renderActions(null, record, 0),
+      render: (record: TeacherEntity) => renderActions(record),
     },
   ];
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await TeacherService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+      const response = await TeacherService.load();
       setData(response);
     };
     fetchData();

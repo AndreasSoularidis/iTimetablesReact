@@ -1,4 +1,4 @@
-export interface TeacherGet {
+export interface ITeacherResponse {
     id: string;
     firstName: string;
     lastName: string;
@@ -13,7 +13,7 @@ export interface TeacherGet {
     schoolUnitId: string;
 }
 
-export interface TeacherPost {
+export interface ITeacherCreateRequest {
     firstName: string;
     lastName: string;
     short: string;
@@ -25,12 +25,13 @@ export interface TeacherPost {
     schoolUnitId: string;
 }
 
-export interface TeacherPut {
+export interface ITeacherUpdateRequest {
     id: string;
     firstName: string;
     lastName: string;
     short: string;
     mandatoryTeachingHours: number;
+    assignedTeachingHours: number;
     color: string;
     continuousTeachingHours: number;
     availabilities: number[];
