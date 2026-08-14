@@ -10,21 +10,21 @@ import {
 import { useTimetableHub } from "../../timetable/hooks/useTimetableHub";
 import { useEffect, useState } from "react";
 import AddEditSchool from "../components/AddEditSchool";
-import type { ISchoolGet, ISchoolPost, ISchoolPut } from "../types";
+import type { ISchoolResponse, ISchoolCreateRequest, ISchoolUpdateRequest } from "../types";
 import { SchoolService } from "../services/SchoolService";
 import { toast } from "react-toastify";
 
 export default function School() {
   const {isProcessing} = useTimetableHub();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [data, setData] = useState<ISchoolGet>();
+  const [data, setData] = useState<ISchoolResponse>();
   const [items, setItems] = useState<DescriptionsProps["items"]>([]);
-  const [editingRecord, setEditingRecord] = useState<ISchoolGet | null>(null);
+  const [editingRecord, setEditingRecord] = useState<ISchoolResponse | null>(null);
 
-  const handleSubmit = async (school: ISchoolPost) => {
+  const handleSubmit = async (school: ISchoolCreateRequest) => {
     try{
       if(editingRecord) {
-        const schoolToUpdate: ISchoolPut = {
+        const schoolToUpdate: ISchoolUpdateRequest = {
           id: editingRecord.id,
           name: school.name,
           schoolYear: school.schoolYear,
@@ -33,7 +33,6 @@ export default function School() {
           morningZone: school.morningZone,
           afternoonZone: school.afternoonZone,
           extendedAfternoonZone: school.extendedAfternoonZone,
-          directorId: school.directorId,
           schoolTypeId: school.schoolTypeId,
         };
         await SchoolService.update(schoolToUpdate);
@@ -47,7 +46,7 @@ export default function School() {
     setIsModalOpen(false);
   };
 
-  const handleEdit = (record: ISchoolGet) => {
+  const handleEdit = (record: ISchoolResponse) => {
     if(isProcessing){
       toast.error("Δεν μπορείτε να επεξεργαστείτε τα στοιχεία της σχολικής μονάδας ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
       return;
@@ -63,7 +62,7 @@ export default function School() {
   ];
 
   useEffect(() => {
-    const response = SchoolService.get("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+    const response = SchoolService.load();
     response.then((res) => {
       if (!res) return;
       setData(res);

@@ -16,7 +16,7 @@ export interface IDirector {
   email: string;
 }
 
-export interface ISchoolGet {
+export interface ISchoolResponse {
   id: string;
   name: string;
   schoolYear: string;
@@ -29,7 +29,7 @@ export interface ISchoolGet {
   schoolType: ILookup;
 }
 
-export interface ISchoolPost {
+export interface ISchoolCreateRequest {
   name: string;
   schoolYear: string;
   teachingDays: number;
@@ -41,7 +41,7 @@ export interface ISchoolPost {
   schoolTypeId: string;
 }
 
-export interface ISchoolPut {
+export interface ISchoolUpdateRequest {
   id: string;
   name: string;
   schoolYear: string;
@@ -50,6 +50,5 @@ export interface ISchoolPut {
   morningZone: boolean;
   afternoonZone: boolean;
   extendedAfternoonZone: boolean;
-  directorId: string;
   schoolTypeId: string;
 }
