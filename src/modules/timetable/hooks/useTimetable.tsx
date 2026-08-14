@@ -1,9 +1,9 @@
-import type { TimetablesGet, TimetableEntity } from "../types";
+import type { TimetableEntity, ITimetableResponse } from "../types";
 
 export function useTimetables(requestData: any): TimetableEntity[] {
   console.log("useTimetables called with requestData:", requestData.timetables);
   return requestData.timetables
-    .map((teaching: TimetablesGet, index: number) => ({
+    .map((teaching: ITimetableResponse, index: number) => ({
       key: `teaching-${index}`,
       feasible: teaching.feasible,
       fitness: teaching.fitness,
