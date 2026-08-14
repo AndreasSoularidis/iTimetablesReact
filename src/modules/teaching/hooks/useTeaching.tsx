@@ -1,9 +1,9 @@
-import type { TeachingsGet, TeachingEntity } from "../types";
+import type { ITeachingsResponse, TeachingEntity } from "../types";
 
 export function useTeachings(requestData: any): TeachingEntity[] {
   console.log("useTeachings called with requestData:", requestData.data);
   return requestData.data
-    .map((teaching: TeachingsGet, index: number) => ({
+    .map((teaching: ITeachingsResponse, index: number) => ({
       key: `teaching-${index}`,
       schoolClassId: teaching.schoolClass.id,
       name: teaching.schoolClass.name,
