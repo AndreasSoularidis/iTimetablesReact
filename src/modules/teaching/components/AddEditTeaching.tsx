@@ -202,15 +202,7 @@ export default function AddEditTeaching({
     async function fetchCourses() {
       try {
         const data = await TeachingService.getCourses();
-        // const data = response
-        //  .sort((a: Course, b: Course) => a.title.localeCompare(b.title)) as Course[];
         setCourses(data);
-        // const filtered = gradeId ? data.filter(c => c.grade.id === gradeId) : data;
-       
-        // setCoursesRemainingHours(filtered.map(course => ({
-        //   id: course.id,
-        //   remainingHours: course.hoursPerWeek - (defaultValues?.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0),
-        // })));
       } catch (error) {
         console.error("Error fetching grades:", error);
       }
@@ -219,7 +211,6 @@ export default function AddEditTeaching({
     async function fetchSchoolClasses() {
       try {
         const response = await axiosInstance.get<SchoolClassEntities>("/schools/classes");
-        console.log("response.data:", response);
         const responseData = response.data.schoolClasses;
         const data  = responseData
          .sort((a: SchoolClassEntity, b: SchoolClassEntity) => a.name.localeCompare(b.name)) as SchoolClassEntity[];
