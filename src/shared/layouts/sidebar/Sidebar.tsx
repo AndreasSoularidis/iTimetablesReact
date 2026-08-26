@@ -1,7 +1,6 @@
 import {
   faCalendarWeek,
   faChalkboardUser,
-  faHouse,
   faPeopleGroup,
   faPersonChalkboard,
   faSchool,

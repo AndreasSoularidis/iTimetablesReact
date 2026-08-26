@@ -5,9 +5,10 @@ const BASE_URL = "https://localhost:7065/api";
 // sessionStorage survives in-page navigation and location.href reloads within the same tab
 let accessToken: string | null = sessionStorage.getItem("accessToken");
 
-export function setTokens(access: string, refresh: string) {
+export function setTokens(access: string, refresh: string, firstName: string) {
   accessToken = access;
   sessionStorage.setItem("accessToken", access);
+  sessionStorage.setItem("firstName", firstName);
   localStorage.setItem("refreshToken", refresh);
 }
 
@@ -38,7 +39,7 @@ axiosInstance.interceptors.response.use(
       if (refreshToken) {
         try {
           const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
-          setTokens(data.accessToken, data.refreshToken);
+          setTokens(data.accessToken, data.refreshToken, data.firstName);
           original.headers.Authorization = `Bearer ${data.accessToken}`;
           return axiosInstance(original);
         } catch {

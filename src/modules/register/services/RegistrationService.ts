@@ -21,8 +21,8 @@ async function createDirectorAndSchool(data: newDirectorAndSchoolUnitPost) {
 async function login(data: LoginRequest): Promise<LoginResponse | undefined> {
   try {
     const response = await axiosInstance.post<LoginResponse>(`/users/login`, data);
-    const { accessToken, refreshToken } = response.data;
-    setTokens(accessToken, refreshToken);
+    const { accessToken, refreshToken, firstName } = response.data;
+    setTokens(accessToken, refreshToken, firstName);
     return response.data;
   } catch (error) {
     toast.error("Σφάλμα κατά τη σύνδεση.");
