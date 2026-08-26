@@ -20,7 +20,7 @@ export default function LoginForm() {
       };
       const result = await RegistrationService.login(loginData);
       if (result) {
-        navigate("/");
+        navigate("/home");
       }
     });
   };
