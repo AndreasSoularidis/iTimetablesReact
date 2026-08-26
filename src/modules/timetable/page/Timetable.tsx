@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import TimeslotsTable from "../../../shared/TimeslotsTable/TimeslotsTable";
 import { useEffect, useState } from "react";
 import { TimetableService } from "../services/TimetableService";
-import type { TimetableEntity, TimetablePost } from "../types";
+import type { TimetableEntity } from "../types";
 import { useTimetableHub } from "../hooks/useTimetableHub";
 
 
@@ -20,10 +20,7 @@ export default function Timetable() {
     };
 
     const handleSubmit = async () => {
-        const payload: TimetablePost = {
-            schoolId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"
-        };
-        const timetableId = await TimetableService.create(payload);
+        const timetableId = await TimetableService.create();
         if (!timetableId) return;
 
         try {
@@ -46,7 +43,7 @@ export default function Timetable() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await TimetableService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+            const response = await TimetableService.load();
             setData(response);
             const status = response[0].feasible ? "Βέλτιστο" : "Μη Εφικτό";
             const fitness = 100 - response[0].fitness;
@@ -64,7 +61,7 @@ export default function Timetable() {
         if (!isCompleted) return;
 
         const fetchData = async () => {
-            const response = await TimetableService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+            const response = await TimetableService.load();
             setData(response);
             const status = response[0].feasible ? "Βέλτιστο" : "Μη Εφικτό";
             const fitness = 100 - response[0].fitness;
@@ -100,10 +97,7 @@ export default function Timetable() {
                     size="large"
                     icon={<DownloadOutlined />}
                     onClick={() => {
-                        const payload: TimetablePost = {
-                            schoolId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"
-                        };
-                        TimetableService.export(payload);
+                        TimetableService.export();
                     }}
                     style={{ fontSize: 16, padding: "0 16px" }}
                 >Eξαγωγή σε Excel

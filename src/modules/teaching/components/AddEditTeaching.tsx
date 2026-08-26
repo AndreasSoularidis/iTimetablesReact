@@ -14,14 +14,14 @@ import {
   type InputNumberProps,
 } from "antd";
 import { DeleteFilled  } from "@ant-design/icons";
-import type { TeachingDelete } from "../types";
+import type { SchoolClassEntities, TeachingDelete } from "../types";
 import { useEffect, useState } from "react";
-import type { Course, GradeCourses, SchoolClassEntity, Teaching, TeachingEntity, TeachingPost } from "../types";
+import type { Course, GradeCourses, SchoolClassEntity, Teaching, TeachingEntity, ITeachingsCreateRequest } from "../types";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { TeacherService } from "../../teacher/services/TeacherService";
 import type { TeacherEntity } from "../../teacher/types";
 import { TeachingService } from "../services/TeachingService";
+import axiosInstance from "../../../shared/api/axiosInstance";
 
 interface IProps {
   isModalOpen: boolean;
@@ -152,7 +152,7 @@ export default function AddEditTeaching({
       return;
     }
 
-    const dataToSubmit: TeachingPost = {
+    const dataToSubmit: ITeachingsCreateRequest = {
       schoolClassId: selectedSchoolClass?.id || defaultValues?.schoolClassId! ,
       teacherId: selectedTeacher,
       courseId: selectedCourse,
@@ -191,7 +191,7 @@ export default function AddEditTeaching({
   useEffect(() => {
 
     async function fetchTeachers() {
-      const loadedTeachers = await TeacherService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b"); // Replace with your actual school unit ID
+      const loadedTeachers = await TeacherService.load(); 
       setTeachersRemainingHours(loadedTeachers.map(teacher => ({
           id: teacher.key,
           remainingHours: teacher.mandatoryTeachingHours - teacher.assignedTeachingHours,
@@ -202,15 +202,7 @@ export default function AddEditTeaching({
     async function fetchCourses() {
       try {
         const data = await TeachingService.getCourses();
-        // const data = response
-        //  .sort((a: Course, b: Course) => a.title.localeCompare(b.title)) as Course[];
         setCourses(data);
-        // const filtered = gradeId ? data.filter(c => c.grade.id === gradeId) : data;
-       
-        // setCoursesRemainingHours(filtered.map(course => ({
-        //   id: course.id,
-        //   remainingHours: course.hoursPerWeek - (defaultValues?.teachings?.find(t => t.course.id === course.id)?.totalHours ?? 0),
-        // })));
       } catch (error) {
         console.error("Error fetching grades:", error);
       }
@@ -218,8 +210,9 @@ export default function AddEditTeaching({
 
     async function fetchSchoolClasses() {
       try {
-        const response = await axios.get(`http://localhost:5191/api/schools/5a4f28d3-8d80-4e41-b0f3-1a6e741d165b/groups`);
-        const data  = response.data.schoolClasses
+        const response = await axiosInstance.get<SchoolClassEntities>("/schools/classes");
+        const responseData = response.data.schoolClasses;
+        const data  = responseData
          .sort((a: SchoolClassEntity, b: SchoolClassEntity) => a.name.localeCompare(b.name)) as SchoolClassEntity[];
         
         setSchoolClasses(data);

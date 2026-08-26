@@ -1,4 +1,4 @@
-export interface TeachingsGet {
+export interface ITeachingsResponse {
     schoolClass: SchoolClass;
     teachings?: TeachingDetails[];
 }
@@ -47,12 +47,16 @@ export interface Teaching {
     dispersion: number[];
 }
 
-export interface TeachingPost{
+export interface ITeachingsCreateRequest {
     schoolClassId: string;
     teacherId: string;
     courseId: string;
     totalHours: number;
     dispersion: number[];
+}
+
+export interface SchoolClassEntities {
+    schoolClasses: SchoolClassEntity[];
 }
 
 export interface SchoolClassEntity {

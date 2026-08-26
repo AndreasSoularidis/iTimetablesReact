@@ -1,14 +1,10 @@
-export interface TimetablesGet {
+export interface ITimetableResponse {
     id: string;
     feasible: boolean;
     fitness: number;
     description: string[];
     timeslots: Teacher[][];
     school: SchoolData;
-}
-
-export interface TimetablePost {
-    schoolId: string;
 }
 
 export interface SchoolData {
