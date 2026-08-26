@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from '../modules/home/pages/Home';
+import Profile from '../modules/profile/pages/Profile';
 import Teacher from '../modules/teacher/pages/Teacher';
 import School from '../modules/school/pages/School';
 import Groups from '../modules/group/pages/Group';
@@ -22,7 +22,9 @@ export default function AppRoutes() {
         <Route path="/groups" element={<Groups/>} />
         <Route path="/teachings" element={<Teaching />} />
         <Route path="/timetables" element={<Timetable />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
+      <Route path="*" element={<div>404 Not Found</div>} /> 
     </Routes>
-  );
+  );  
 }
