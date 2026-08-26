@@ -17,7 +17,6 @@ export default function AppRoutes() {
       <Route path="/login" element={<LoginForm />} />
       {/* <Route path="/register" element={<Register />} /> */}
       <Route element={<MainLayout />}>
-        <Route path="/home" element={<Home />} />
         <Route path="/school" element={<School />} />
         <Route path="/teachers" element={<Teacher />} />
         <Route path="/groups" element={<Groups/>} />
