@@ -2,7 +2,7 @@ import { App, Button, Card, Col, Divider, Row, Space } from "antd";
 import { EditOutlined, PlusOutlined, DeleteFilled } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { GroupService } from "../../group/services/GroupServices";
-import type { GroupEntity, GroupPost } from "../../group/types";
+import type { SchoolClassEntity, ISchoolClassCreateRequest } from "../../group/types";
 import AddEditGroup from "../components/AddEditGroup";
 import {useTimetableHub} from "../../timetable/hooks/useTimetableHub";
 import { toast } from "react-toastify";
@@ -10,13 +10,13 @@ import { toast } from "react-toastify";
 export default function Group() {
     const {isProcessing} = useTimetableHub();
     const { modal } = App.useApp();
-    const [data, setData] = useState<GroupEntity[]>([]);
+    const [data, setData] = useState<SchoolClassEntity[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedGroup, setSelectedGroup] = useState<GroupEntity | null>(null);
+    const [selectedGroup, setSelectedGroup] = useState<SchoolClassEntity | null>(null);
     const [reload, setReload] = useState(false);
 
 
-    const handleEdit = (group: GroupEntity) => {
+    const handleEdit = (group: SchoolClassEntity) => {
         if(isProcessing){
             toast.error("Δεν μπορείτε να επεξεργαστείτε τμήματα ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
             return;
@@ -25,7 +25,7 @@ export default function Group() {
         setModalOpen(true);
     }
     
-    const handleDelete = async (group: GroupEntity) => {
+    const handleDelete = async (group: SchoolClassEntity) => {
         if(isProcessing){
             toast.error("Δεν μπορείτε να διαγράψετε τμήματα ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
             return;
@@ -44,7 +44,7 @@ export default function Group() {
         });
     }
 
-    const handleSubmit = async (group: GroupPost) => {
+    const handleSubmit = async (group: ISchoolClassCreateRequest) => {
     try{
         if(selectedGroup){
             const groupToUpdate = { ...group, id: selectedGroup.key, assignedHours: selectedGroup.assignedHours };
@@ -64,7 +64,7 @@ export default function Group() {
 
     useEffect(() => {
     const fetchData = async () => {
-        const response = await GroupService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+        const response = await GroupService.load();
         
         setData(response.sort((a, b) => a.name.localeCompare(b.name)));
     };
