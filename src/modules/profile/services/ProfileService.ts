@@ -23,7 +23,20 @@ async function updateDirector(director: DirectorUpdateRequest): Promise<void> {
   }
 }
 
+async function deleteDirector(directorId: string) {
+  try {
+    if (directorId === undefined) return;
+
+    await axiosInstance.delete(`/users/${directorId}`);
+    toast.success("Το προφίλ διαγράφηκε με επιτυχία!");
+  } catch (error) {
+    console.error(error);
+    toast.error("Σφάλμα κατά τη διαγραφή του προφίλ."); 
+  }
+}
+
 export const ProfileService = {
   load: getDirector,
   update: updateDirector,
+  delete: deleteDirector,
 };

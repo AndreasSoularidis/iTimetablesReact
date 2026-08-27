@@ -16,6 +16,11 @@ export default function Profile() {
     setData(record);
   }
 
+  const handleDelete = async (record: DirectorResponse) => {
+    await ProfileService.delete(record.id);
+    setReload((prev) => !prev);
+  }
+
   const handleSubmit = async (userProfile: DirectorUpdateRequest) => {
     await ProfileService.update(userProfile);
     setReload((prev) => !prev);
@@ -71,7 +76,7 @@ export default function Profile() {
           danger
           icon={<EditOutlined />}
           style={{ fontSize: 16, textAlign: "center", padding: "0 16px", height: 40 }}
-        // onClick={() => handleEdit(profileData!)}
+        onClick={() => handleDelete(data!)}
         >
           Διαγραφή
         </Button>
