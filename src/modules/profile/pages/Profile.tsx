@@ -4,8 +4,11 @@ import { Descriptions, Divider, Space, Button, type DescriptionsProps } from "an
 import type { DirectorResponse, DirectorUpdateRequest } from "../types";
 import { EditOutlined } from "@ant-design/icons";
 import EditUserProfile from "../components/EditUserProfile";
+import { useNavigate } from "react-router-dom";
+import { clearTokens } from "../../../shared/api/axiosInstance";
 
 export default function Profile() {
+  const navigate = useNavigate();
   const [profileData, setProfileData] = useState<DescriptionsProps['items']>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<DirectorResponse | null>(null);
@@ -17,8 +20,12 @@ export default function Profile() {
   }
 
   const handleDelete = async (record: DirectorResponse) => {
-    await ProfileService.delete(record.id);
-    setReload((prev) => !prev);
+    const wasDeleted = await ProfileService.delete(record.id);
+
+    if (wasDeleted) {
+      clearTokens();
+      navigate("/login");
+    }
   }
 
   const handleSubmit = async (userProfile: DirectorUpdateRequest) => {
