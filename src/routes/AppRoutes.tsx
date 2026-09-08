@@ -8,6 +8,7 @@ import Teaching from '../modules/teaching/page/Teaching';
 import LoginForm from '../modules/register/pages/LoginForm';
 import MainLayout from '../shared/layouts/MainLayout';
 import LandingPage from '../modules/landing/pages/LandingPage';
+import ProtectedRoute from '../shared/components/ProtectedRoute';
 
 
 export default function AppRoutes() {
@@ -16,13 +17,15 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginForm />} />
       {/* <Route path="/register" element={<Register />} /> */}
-      <Route element={<MainLayout />}>
-        <Route path="/school" element={<School />} />
-        <Route path="/teachers" element={<Teacher />} />
-        <Route path="/groups" element={<Groups/>} />
-        <Route path="/teachings" element={<Teaching />} />
-        <Route path="/timetables" element={<Timetable />} />
-        <Route path="/profile" element={<Profile />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<MainLayout />}>
+          <Route path="/school" element={<School />} />
+          <Route path="/teachers" element={<Teacher />} />
+          <Route path="/groups" element={<Groups/>} />
+          <Route path="/teachings" element={<Teaching />} />
+          <Route path="/timetables" element={<Timetable />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Route>
       <Route path="*" element={<div>404 Not Found</div>} /> 
     </Routes>

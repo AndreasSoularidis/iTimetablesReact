@@ -21,7 +21,6 @@ export default function Profile() {
 
   const handleDelete = async (record: DirectorResponse) => {
     const wasDeleted = await ProfileService.delete(record.id);
-
     if (wasDeleted) {
       clearTokens();
       navigate("/login");

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Dropdown, type MenuProps } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { Link } from "react-router-dom";
+import { clearTokens } from "../../api/axiosInstance";
 
 export default function TopMenu() {
   const firstName = sessionStorage.getItem("firstName") || "";
@@ -18,9 +19,11 @@ export default function TopMenu() {
   {
     key: '2',
     label: (
-      <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+      <Link to="/login" onClick={() => {
+        clearTokens();
+      }}>
         Αποσύνδεση
-      </a>
+      </Link>
     ),
   }
 ];
