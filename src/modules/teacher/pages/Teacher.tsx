@@ -1,5 +1,5 @@
 import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, App } from "antd";
-import { PlusOutlined, DeleteFilled, EditFilled  } from "@ant-design/icons";
+import { PlusOutlined, DeleteFilled, EditFilled, ArrowUpOutlined  } from "@ant-design/icons";
 import type { TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
 import type { ITeacherCreateRequest, ITeacherUpdateRequest, TeacherEntity } from "../types";
@@ -144,6 +144,17 @@ export default function Teacher() {
         >
           Προσθήκη
         </Button>
+        <Button
+          type="primary"
+          size="large"
+          icon={<ArrowUpOutlined />}
+          style={{ fontSize: 16, padding: "0 16px" }}
+          onClick={() => {
+            
+          }}
+        >
+          Εισαγωγή από Excel
+        </Button>
       </Space>
       <Table<TeacherEntity>
         columns={columns}
@@ -167,7 +178,7 @@ export default function Teacher() {
       >
         {selectedTeacher && (
           <>
-            <Descriptions column={1} bordered size="small" style={{ label: { width: 160 } }}>
+            <Descriptions column={1} bordered size="small" style={{  width: 160 } }>
               <Descriptions.Item label="Όνοματεπώνυμο">{selectedTeacher.name}</Descriptions.Item>
               <Descriptions.Item label="Συντ/φια">{selectedTeacher.short}</Descriptions.Item>
               <Descriptions.Item label="Ειδικότητα">{selectedTeacher.specialty}</Descriptions.Item>
