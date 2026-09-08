@@ -37,7 +37,6 @@ export interface ISchoolCreateRequest {
   morningZone: boolean;
   afternoonZone: boolean;
   extendedAfternoonZone: boolean;
-  directorId: string;
   schoolTypeId: string;
 }
 

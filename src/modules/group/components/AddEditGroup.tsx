@@ -7,7 +7,7 @@ import {
   Select,
 } from "antd";
 import { useEffect, useState } from "react";
-import type { GroupEntity, GroupPost, LookUp } from "../types";
+import type { SchoolClassEntity, ISchoolClassCreateRequest, LookUp } from "../types";
 import { toast } from "react-toastify";
 import axios from "axios";
 
@@ -16,8 +16,8 @@ const SCHOOL_UNIT_ID = "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b";
 interface IProps {
   isModalOpen: boolean;
   modifyIsModalOpen: (value: boolean) => void;
-  defaultEditValues: GroupEntity | undefined;
-  onSubmit: (group: GroupPost) => Promise<void>;
+  defaultEditValues: SchoolClassEntity | undefined;
+  onSubmit: (group: ISchoolClassCreateRequest) => Promise<void>;
 }
 
 export default function AddEditGroup({
@@ -39,7 +39,7 @@ export default function AddEditGroup({
   const handleOk = async () => {
     form.validateFields()
     .then(async (values) => {
-      const dataToSubmit: GroupPost = {
+      const dataToSubmit: ISchoolClassCreateRequest = {
         name: values.name,
         totalHours: values.totalHours,
         short: values.name,

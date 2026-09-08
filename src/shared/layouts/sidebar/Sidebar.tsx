@@ -1,7 +1,6 @@
 import {
   faCalendarWeek,
   faChalkboardUser,
-  faHouse,
   faPeopleGroup,
   faPersonChalkboard,
   faSchool,
@@ -13,15 +12,6 @@ import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
   const sideBarMenuItems: MenuProps["items"] = [
-    {
-      key: "home",
-      icon: <FontAwesomeIcon icon={faHouse} />,
-      label: (
-        <NavLink to="/">
-          Αρχική
-        </NavLink>
-      ),
-    },
     {
       key: "school",
       icon: <FontAwesomeIcon icon={faSchool} />,
@@ -64,15 +54,6 @@ export default function Sidebar() {
       label: (
         <NavLink to="/timetables">
           Προγράμματα
-        </NavLink>
-      ),
-    },
-    {
-      key: "register",
-      icon: <FontAwesomeIcon icon={faCalendarWeek} />,
-      label: (
-        <NavLink to="/login">
-          Σύνδεση
         </NavLink>
       ),
     }

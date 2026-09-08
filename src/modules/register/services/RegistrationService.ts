@@ -1,3 +1,4 @@
+import axios from "axios";
 import { toast } from "react-toastify";
 import type { LoginRequest, LoginResponse, newDirectorAndSchoolUnitPost } from "../types";
 import axiosInstance, { setTokens } from "../../../shared/api/axiosInstance";
@@ -21,11 +22,15 @@ async function createDirectorAndSchool(data: newDirectorAndSchoolUnitPost) {
 async function login(data: LoginRequest): Promise<LoginResponse | undefined> {
   try {
     const response = await axiosInstance.post<LoginResponse>(`/users/login`, data);
-    const { accessToken, refreshToken } = response.data;
-    setTokens(accessToken, refreshToken);
+    const { accessToken, refreshToken, firstName } = response.data;
+    setTokens(accessToken, refreshToken, firstName);
     return response.data;
   } catch (error) {
-    toast.error("Σφάλμα κατά τη σύνδεση.");
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      toast.error("Λανθασμένα στοιχεία σύνδεσης.");
+    } else {
+      toast.error("Σφάλμα κατά τη σύνδεση.");
+    }
     console.error("Error logging in:", error);
   }
 }

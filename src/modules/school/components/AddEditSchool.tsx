@@ -8,15 +8,16 @@ import {
   type CheckboxOptionType,
 } from "antd";
 import { useEffect, useState } from "react";
-import type { ISchoolGet, ISchoolPost } from "../types";
+
 import axios from "axios";
+import type { ISchoolCreateRequest, ISchoolResponse } from "../types";
 
 interface IProps {
   isModalOpen: boolean;
   modifyIsModalOpen: (value: boolean) => void;
-  defaultEditValues: ISchoolGet | null;
+  defaultEditValues: ISchoolResponse | null;
   zoneOptions: CheckboxOptionType<string>[];
-  onSubmit: (school: ISchoolPost) => Promise<void>;
+  onSubmit: (school: ISchoolCreateRequest) => Promise<void>;
 }
 export default function AddEditSchool({
   isModalOpen,
@@ -63,7 +64,7 @@ export default function AddEditSchool({
   const handleOk = async () => {
     try {
       const values = form.getFieldsValue();
-      const dataToSubmit: ISchoolPost = {
+      const dataToSubmit: ISchoolCreateRequest = {
         name: values.SchoolUnit,
         schoolYear: values.SchoolYear,
         teachingDays: values.TeachingDays,
@@ -73,7 +74,6 @@ export default function AddEditSchool({
           values.AvailableZones?.includes("afternoonZone") || false,
         extendedAfternoonZone:
           values.AvailableZones?.includes("extendedAfternoonZone") || false,
-        directorId: "d8945131-d62f-4356-93fb-ffd9f71846eb",
         schoolTypeId: selectedSchoolType || "", // Use the selected school type ID
       };
       await onSubmit(dataToSubmit);
