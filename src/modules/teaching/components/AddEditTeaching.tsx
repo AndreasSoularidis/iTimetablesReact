@@ -51,7 +51,7 @@ export default function AddEditTeaching({
 
   const [teachersRemainingHours, setTeachersRemainingHours] = useState<{id: string, remainingHours: number}[]>([]);
   const [coursesRemainingHours, setCoursesRemainingHours] = useState<{id: string, remainingHours: number}[]>([]);
-
+  
   const handleCancel = () => {
     form.resetFields();
     modifyIsModalOpen(false);
@@ -157,7 +157,7 @@ export default function AddEditTeaching({
       teacherId: selectedTeacher,
       courseId: selectedCourse,
       totalHours: assignedHours,
-      dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0],
+      dispersion: [0, oneHoursCount, twoHoursCount, 0, 0, 0, 0, 0],
     };
     try {
       const response = await TeachingService.insert(dataToSubmit);
