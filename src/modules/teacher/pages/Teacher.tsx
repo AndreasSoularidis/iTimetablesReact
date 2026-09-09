@@ -1,5 +1,5 @@
 import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, App, Upload } from "antd";
-import { PlusOutlined, DeleteFilled, EditFilled, UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteFilled, EditFilled, UploadOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
 import type { ITeacherCreateRequest, ITeacherUpdateRequest, TeacherEntity } from "../types";
@@ -40,15 +40,31 @@ export default function Teacher() {
       toast.error("Δεν μπορείτε να διαγράψετε εκπαιδευτικούς ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
       return;
     }
+    
     modal.confirm({
       title: "Επιβεβαίωση Διαγραφής",
       content: "Είστε σίγουροι ότι θέλετε να διαγράψετε τον εκπαιδευτικό;",
       onOk: async () => {
-        try {
-          await TeacherService.delete(teacher);
+        const success = await TeacherService.delete(teacher);
+        if (success) {
           setReload((prev) => !prev);
-        } catch (error) {
-          console.error("Error deleting teacher:", error);
+        }
+      },
+    });
+  }
+
+  const handleDeleteAll = async () => {
+    if (isProcessing) {
+      toast.error("Δεν μπορείτε να διαγράψετε τους εκπαιδευτικούς ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
+      return;
+    }
+    modal.confirm({
+      title: "Επιβεβαίωση Διαγραφής",
+      content: "Είστε σίγουροι ότι θέλετε να διαγράψετε όλους τους εκπαιδευτικούς;",
+      onOk: async () => {
+        const success = await TeacherService.deleteAll();
+        if (success) {
+          setReload((prev) => !prev);
         }
       },
     });
@@ -145,14 +161,25 @@ export default function Teacher() {
         >
           Προσθήκη
         </Button>
+        <Button
+          type="primary"
+          danger
+          disabled={data.length === 0}
+          size="large"
+          icon={<DeleteOutlined />}
+          style={{ fontSize: 16, padding: "0 16px" }}
+          onClick={handleDeleteAll}
+        >
+          Διαγραφή
+        </Button>
         <Upload
           customRequest={async ({ file, onSuccess, onError }) => {
             const formData = new FormData();
             formData.append("file", file);
 
-              try {
-                const response = await axiosInstance.post("/schools/teachers/import", formData, {
-                  headers: {
+            try {
+              const response = await axiosInstance.post("/schools/teachers/import", formData, {
+                headers: {
                   "Content-Type": "multipart/form-data",
                 },
               });
@@ -197,7 +224,7 @@ export default function Teacher() {
       >
         {selectedTeacher && (
           <>
-            <Descriptions column={1} bordered size="small" style={{  label: { width: 160 } }}>
+            <Descriptions column={1} bordered size="small" style={{ label: { width: 160 } }}>
               <Descriptions.Item label="Όνοματεπώνυμο">{selectedTeacher.name}</Descriptions.Item>
               <Descriptions.Item label="Συντ/φια">{selectedTeacher.short}</Descriptions.Item>
               <Descriptions.Item label="Ειδικότητα">{selectedTeacher.specialty}</Descriptions.Item>

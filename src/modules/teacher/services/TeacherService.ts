@@ -40,17 +40,28 @@ async function updateTeacher(teacher: ITeacherUpdateRequest){
   }
 }
 
-async function deleteTeacher(teacher: TeacherEntity) {
+async function deleteTeacher(teacher: TeacherEntity) : Promise<boolean> {
   try {
     const teacherId: string | undefined = teacher.key
     if (teacherId === undefined) {
-      return;
+      return false;
     }
     await axiosInstance.delete(`/schools/teachers/${teacherId}`);
     toast.success("Ο εκπαιδευτικός διαγράφηκε με επιτυχία!");
+    return true;
   } catch (error) {
-    console.error(error);
-    toast.error("Σφάλμα κατά τη διαγραφή του εκπαιδευτικού.");
+    return false;
+  }
+}
+
+async function deleteAllTeachers() : Promise<boolean> {
+  try {
+    await axiosInstance.delete(`/schools/teachers/all`);
+    toast.success("Οι εκπαιδευτικοί διαγράφηκαν με επιτυχία!");
+    return true;
+  } catch (error) {
+    toast.error("Σφάλμα κατά τη διαγραφή των εκπαιδευτικών.");
+    return false;
   }
 }
 
@@ -59,4 +70,5 @@ export const TeacherService = {
   insert: insertTeacher,
   update: updateTeacher,
   delete: deleteTeacher,
+  deleteAll: deleteAllTeachers,
 };
