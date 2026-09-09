@@ -7,6 +7,7 @@ import {
   type CheckboxOptionType,
   type DescriptionsProps,
 } from "antd";
+import { EditFilled } from "@ant-design/icons";
 import { useTimetableHub } from "../../timetable/hooks/useTimetableHub";
 import { useEffect, useState } from "react";
 import AddEditSchool from "../components/AddEditSchool";
@@ -72,6 +73,9 @@ export default function School() {
         { key: "3", label: "Σχολικό Έτος", children: res.schoolYear ?? "" },
         { key: "4", label: "Ημέρες Διδασκαλίας", children: res.teachingDays },
         { key: "5", label: "Μέγιστες Ώρες Διδασκαλίας", children: res.maxHoursPerDay },
+        { key: "6", label: "Αριθμός Τμημάτων", children: res.numberOfClasses },
+        { key: "7", label: "Αριθμός Διδασκόντων", children: res.numberOfTeachers },
+        { key: "8", label: "Αριθμός Διδασκαλιών", children: res.numberOfTeachings },
       ]);
     });
   }, [editingRecord]);
@@ -80,16 +84,17 @@ export default function School() {
     <>
       <h2>Στοιχεία Σχολικής Μονάδας</h2>
       <Divider orientation="start" orientationMargin={0}></Divider>
-      <Space>
+      <Space style={{ marginBottom: 16 }}>
         <Button
           type="primary"
-          // icon={<PlusOutlined />}
+          size="large"
+          icon={<EditFilled />}
           onClick={() => handleEdit(data!)}
         >
           Επεξεργασία
         </Button>
       </Space>
-      <Descriptions layout="vertical" items={items} />
+      <Descriptions layout="horizontal" items={items} />
       <br />
       <Checkbox.Group
         options={zoneOptions}

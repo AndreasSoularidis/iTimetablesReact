@@ -25,7 +25,9 @@ export interface ISchoolResponse {
   morningZone: boolean;
   afternoonZone: boolean;
   extendedAfternoonZone: boolean;
-  director: IDirector;
+  numberOfClasses: number;
+  numberOfTeachers: number;
+  numberOfTeachings: number;
   schoolType: ILookup;
 }
 
