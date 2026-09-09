@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { ProfileService } from "../services/ProfileService";
-import { Descriptions, Divider, Space, Button, type DescriptionsProps } from "antd";
+import { Descriptions, Divider, Space, Button, type DescriptionsProps, App } from "antd";
 import type { DirectorResponse, DirectorUpdateRequest } from "../types";
-import { EditOutlined } from "@ant-design/icons";
+import { DeleteFilled, EditOutlined } from "@ant-design/icons";
 import EditUserProfile from "../components/EditUserProfile";
 import { useNavigate } from "react-router-dom";
 import { clearTokens } from "../../../shared/api/axiosInstance";
 
 export default function Profile() {
+  const { modal } = App.useApp();
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState<DescriptionsProps['items']>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,11 +21,17 @@ export default function Profile() {
   }
 
   const handleDelete = async (record: DirectorResponse) => {
-    const wasDeleted = await ProfileService.delete(record.id);
-    if (wasDeleted) {
-      clearTokens();
-      navigate("/login");
-    }
+    modal.confirm({
+      title: "Επιβεβαίωση Διαγραφής",
+      content: "Είστε σίγουροι ότι θέλετε να διαγράψετε το προφίλ σας;",
+      onOk: async () => {
+        const success = await ProfileService.delete(record.id);
+        if (success) {
+          clearTokens();
+          navigate("/login");
+        }
+      },
+    });
   }
 
   const handleSubmit = async (userProfile: DirectorUpdateRequest) => {
@@ -80,9 +87,9 @@ export default function Profile() {
         <Button
           type="primary"
           danger
-          icon={<EditOutlined />}
+          icon={<DeleteFilled />}
           style={{ fontSize: 16, textAlign: "center", padding: "0 16px", height: 40 }}
-        onClick={() => handleDelete(data!)}
+          onClick={() => handleDelete(data!)}
         >
           Διαγραφή
         </Button>

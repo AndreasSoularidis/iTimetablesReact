@@ -1,5 +1,5 @@
 import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, App, Upload } from "antd";
-import { PlusOutlined, DeleteFilled, EditFilled, ArrowUpOutlined, UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteFilled, EditFilled, UploadOutlined } from "@ant-design/icons";
 import type { TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
 import type { ITeacherCreateRequest, ITeacherUpdateRequest, TeacherEntity } from "../types";
