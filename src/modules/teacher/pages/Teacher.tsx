@@ -1,5 +1,5 @@
-import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, App } from "antd";
-import { PlusOutlined, DeleteFilled, EditFilled  } from "@ant-design/icons";
+import { Space, Table, Divider, Button, Tooltip, Drawer, Descriptions, Tag, App, Upload } from "antd";
+import { PlusOutlined, DeleteFilled, EditFilled, ArrowUpOutlined, UploadOutlined } from "@ant-design/icons";
 import type { TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
 import type { ITeacherCreateRequest, ITeacherUpdateRequest, TeacherEntity } from "../types";
@@ -8,10 +8,11 @@ import AvailabilityTable from "../../../shared/AvailabilityTable/AvailabilityTab
 import AddEditTeacher from "../components/AddEditTeacher";
 import { useTimetableHub } from "../../timetable/hooks/useTimetableHub";
 import { toast } from "react-toastify";
+import axiosInstance from "../../../shared/api/axiosInstance";
 
 export default function Teacher() {
   const { modal } = App.useApp();
-  const {isProcessing} = useTimetableHub();
+  const { isProcessing } = useTimetableHub();
   const [data, setData] = useState<TeacherEntity[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherEntity | null>(null);
@@ -20,24 +21,24 @@ export default function Teacher() {
   const showDrawer = () => {
     setDrawerOpen(true);
   }
-  
+
   const onClose = () => {
     setDrawerOpen(false);
   }
 
   const handleEdit = (teacher: TeacherEntity) => {
-    if(isProcessing){
+    if (isProcessing) {
       toast.error("Δεν μπορείτε να επεξεργαστείτε εκπαιδευτικούς ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
-      return; 
+      return;
     }
     setSelectedTeacher(teacher);
     setModalOpen(true);
   }
 
   const handleDelete = async (teacher: TeacherEntity) => {
-    if(isProcessing){
+    if (isProcessing) {
       toast.error("Δεν μπορείτε να διαγράψετε εκπαιδευτικούς ενώ η δημιουργία του ωρολογίου βρίσκεται σε εξέλιξη.");
-      return; 
+      return;
     }
     modal.confirm({
       title: "Επιβεβαίωση Διαγραφής",
@@ -55,11 +56,11 @@ export default function Teacher() {
 
 
   const handleSubmit = async (teacher: ITeacherCreateRequest | ITeacherUpdateRequest) => {
-    try{
-      if(selectedTeacher){
+    try {
+      if (selectedTeacher) {
         const teacherToUpdate = { ...teacher, id: selectedTeacher.key, assignedTeachingHours: selectedTeacher.assignedTeachingHours } as ITeacherUpdateRequest;
         await TeacherService.update(teacherToUpdate);
-      }else{
+      } else {
         await TeacherService.insert(teacher);
       }
       setReload((prev) => !prev);
@@ -76,14 +77,14 @@ export default function Teacher() {
         <Tooltip placement="topLeft" title="Επεξεργασία">
           <Button
             type="default"
-            onClick={(e) => {e.stopPropagation(); handleEdit(record); }}
+            onClick={(e) => { e.stopPropagation(); handleEdit(record); }}
           >
             <EditFilled />
           </Button>
         </Tooltip>
         <Tooltip placement="topLeft" title="Διαγραφή">
           <Button
-             onClick={(e) => { e.stopPropagation(); handleDelete(record); }}
+            onClick={(e) => { e.stopPropagation(); handleDelete(record); }}
             danger
           >
             <DeleteFilled />
@@ -144,10 +145,39 @@ export default function Teacher() {
         >
           Προσθήκη
         </Button>
+        <Upload
+          customRequest={async ({ file, onSuccess, onError }) => {
+            const formData = new FormData();
+            formData.append("file", file);
+
+              try {
+                const response = await axiosInstance.post("/schools/teachers/import", formData, {
+                  headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              });
+              onSuccess?.(response.data);
+              toast.success("Η εισαγωγή των εκπαιδευτικών ολοκληρώθηκε!");
+              setReload((prev) => !prev);
+            } catch (error) {
+              onError?.(error as Error);
+              toast.error("Σφάλμα κατά την εισαγωγή των εκπαιδευτικών.");
+            }
+          }}
+          showUploadList={false}
+        >
+          <Button
+            type="primary"
+            size="large"
+            icon={<UploadOutlined />}
+          >
+            Εισαγωγή από Excel
+          </Button>
+        </Upload>
       </Space>
       <Table<TeacherEntity>
         columns={columns}
-       
+
         dataSource={data}
         pagination={{ pageSize: 10 }}
         onRow={(record) => ({
@@ -167,7 +197,7 @@ export default function Teacher() {
       >
         {selectedTeacher && (
           <>
-            <Descriptions column={1} bordered size="small" style={{ label: { width: 160 } }}>
+            <Descriptions column={1} bordered size="small" style={{  label: { width: 160 } }}>
               <Descriptions.Item label="Όνοματεπώνυμο">{selectedTeacher.name}</Descriptions.Item>
               <Descriptions.Item label="Συντ/φια">{selectedTeacher.short}</Descriptions.Item>
               <Descriptions.Item label="Ειδικότητα">{selectedTeacher.specialty}</Descriptions.Item>
