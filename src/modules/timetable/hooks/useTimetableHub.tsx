@@ -42,6 +42,7 @@ export function TimetableHubProvider({ children }: { children: ReactNode }) {
         activeTimetableIdRef.current = null;
         setActiveTimetableId(null);
         setIsProcessing(false);
+        setIsCompleted(true);
       }
     });
 
@@ -76,6 +77,8 @@ export function TimetableHubProvider({ children }: { children: ReactNode }) {
     await connectionRef.current.invoke("JoinTimetableGroup", timetableId);
     activeTimetableIdRef.current = timetableId;
     setActiveTimetableId(timetableId);
+    setProgress(null);
+    setIsCompleted(false);
     setIsProcessing(true);
   }, []);
 
