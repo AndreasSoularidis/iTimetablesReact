@@ -33,7 +33,7 @@ export default function Teaching() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await TeachingService.load("5a4f28d3-8d80-4e41-b0f3-1a6e741d165b");
+      const response = await TeachingService.load();
       setData(response);
     };
     fetchData();
