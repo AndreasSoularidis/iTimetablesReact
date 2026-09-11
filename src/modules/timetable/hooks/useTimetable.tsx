@@ -14,6 +14,7 @@ export function useTimetables(requestData: any): TimetableEntity[] {
         maxHoursPerDay: teaching.school.maxHoursPerDay,
         teachingDays: teaching.school.teachingDays,
         schoolClasses: teaching.school.schoolClasses,
-      }
+      },
+      createdAt: teaching.createdAt,
     }))
 }

@@ -22,7 +22,6 @@ export interface ITeacherCreateRequest {
     continuousTeachingHours: number;
     availabilities: number[];
     specialtyId: string;
-    schoolUnitId: string;
 }
 
 export interface ITeacherUpdateRequest {

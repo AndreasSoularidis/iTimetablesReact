@@ -74,7 +74,11 @@ export default function Teacher() {
   const handleSubmit = async (teacher: ITeacherCreateRequest | ITeacherUpdateRequest) => {
     try {
       if (selectedTeacher) {
-        const teacherToUpdate = { ...teacher, id: selectedTeacher.key, assignedTeachingHours: selectedTeacher.assignedTeachingHours } as ITeacherUpdateRequest;
+        const teacherToUpdate = { 
+          ...teacher, 
+          id: selectedTeacher.key, 
+          assignedTeachingHours: selectedTeacher.assignedTeachingHours,
+        } as ITeacherUpdateRequest;
         await TeacherService.update(teacherToUpdate);
       } else {
         await TeacherService.insert(teacher);

@@ -5,7 +5,6 @@ export interface DirectorResponse {
   username: string;
   email: string;
   schoolUnit: Lookup;
-  createdAt: Date;
 }
 
 export interface DirectorUpdateRequest {
@@ -14,7 +13,6 @@ export interface DirectorUpdateRequest {
   lastName: string;
   username: string;
   email: string;
-  createdAt: Date;
 }
 
 export interface Lookup {
