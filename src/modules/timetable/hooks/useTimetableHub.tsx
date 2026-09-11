@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback, ty
 import * as signalR from "@microsoft/signalr";
 import type { ProgressMessage } from "../types";
 
-const HUB_URL = "http://localhost:5191/timetableProgressHub";
+const HUB_URL = import.meta.env.VITE_HUB_URL;
 
 interface TimetableHubContextValue {
   progress: ProgressMessage | null;
