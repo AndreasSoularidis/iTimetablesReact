@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://localhost:7065/api";
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // sessionStorage survives in-page navigation and location.href reloads within the same tab
 let accessToken: string | null = sessionStorage.getItem("accessToken");

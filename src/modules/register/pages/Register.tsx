@@ -6,6 +6,7 @@ import type { DirectorEntity, LookUp, SchoolUnitEntity } from "../types";
 import AddDirector from "../components/AddDirector";
 import AddSchoolUnit from "../components/AddSchoolUnit";
 import axios from "axios";
+import { BASE_URL } from "../../../shared/api/axiosInstance";
 import { RegistrationService } from "../services/RegistrationService";
 
 const STEPS = [
@@ -92,7 +93,7 @@ export default function Register({ open, onClose }: RegisterProps) {
     useEffect(() => {
         async function fetchSchoolTypes() {
             try {
-                const response = await axios.get("http://localhost:5191/api/schoolTypes");
+                const response = await axios.get(`${BASE_URL}/schoolTypes`);
                 setSchoolTypes(response.data.schoolTypes);
             } catch (error) {
                 console.error("Error fetching school types:", error);

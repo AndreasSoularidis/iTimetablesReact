@@ -16,10 +16,9 @@ async function getDirector(): Promise<DirectorResponse | null> {
 async function updateDirector(director: DirectorUpdateRequest): Promise<void> {
   try{
     await axiosInstance.put(`/users/${director.id}`, director);
-    toast.success("Τα στοιχεία του διευθυντή ενημε����θηκαν με επιτυχία!");
+    toast.success("Τα στοιχεία του διευθυντή ενημερώθηκαν με επιτυχία!");
   }catch(error){
-    console.error("Error updating director:", error);
-    toast.error("Σφάλμα κατά την ενημέ��ωση των στοιχείων του διευθυντή.");
+    toast.error("Σφάλμα κατά την ενημέρωση των στοιχείων του διευθυντή.");
   }
 }
 

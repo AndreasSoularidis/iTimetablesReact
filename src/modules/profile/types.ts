@@ -4,7 +4,6 @@ export interface DirectorResponse {
   lastName: string;
   username: string;
   email: string;
-  password: string;
   schoolUnit: Lookup;
 }
 
@@ -14,7 +13,6 @@ export interface DirectorUpdateRequest {
   lastName: string;
   username: string;
   email: string;
-  password: string;
 }
 
 export interface Lookup {

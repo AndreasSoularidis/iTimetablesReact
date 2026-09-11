@@ -51,6 +51,7 @@ export default function Timetable() {
                 { key: "1", label: "Κατάσταση", children: status },
                 { key: "2", label: "Βαθμολογία", children: fitness.toPrecision(4).toString() },
                 { key: "3", label: "Πλήθος Παραβιάσεων", children: response[0].description.length.toString() },
+                { key: "4", label: "Ημερομηνία Δημιουργίας", children: new Date(response[0].createdAt).toLocaleString() },
             ]);
         };
 
@@ -69,6 +70,7 @@ export default function Timetable() {
                 { key: "1", label: "Κατάσταση", children: status },
                 { key: "2", label: "Βαθμολογία", children: fitness.toPrecision(4).toString() },
                 { key: "3", label: "Πλήθος Παραβιάσεων", children: response[0].description.length.toString() },
+                { key: "4", label: "Ημερομηνία Δημιουργίας", children: new Date(response[0].createdAt).toLocaleString() },
             ]);
         };
 

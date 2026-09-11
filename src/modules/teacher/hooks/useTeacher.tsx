@@ -1,8 +1,8 @@
-import type { TeacherGet, TeacherEntity } from "../types";
+import type { ITeacherResponse, TeacherEntity } from "../types";
 
 export function useTeachers(requestData: any): TeacherEntity[] {
   console.log("useTeachers called with requestData:", requestData.teachers);
-  return requestData.teachers.map((teacher: TeacherGet) => ({
+  return requestData.teachers.map((teacher: ITeacherResponse) => ({
     key: teacher.id,
     name: `${teacher.firstName} ${teacher.lastName}`,
     short: teacher.short,

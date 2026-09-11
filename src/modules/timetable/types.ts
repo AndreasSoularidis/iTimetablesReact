@@ -5,6 +5,7 @@ export interface ITimetableResponse {
     description: string[];
     timeslots: Teacher[][];
     school: SchoolData;
+    createdAt: Date;
 }
 
 export interface SchoolData {
@@ -29,6 +30,7 @@ export interface TimetableEntity {
     description: string[];
     timeslots: Teacher[][];
     school: SchoolData;
+    createdAt: Date;
 }
 
 export interface ProgressMessage {

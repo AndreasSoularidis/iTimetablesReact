@@ -72,11 +72,11 @@ export default function AddEditTeacher({
         short: `${values.firstName.charAt(0)}${values.lastName.charAt(0)}`,
         mandatoryTeachingHours: values.mandatoryTeachingHours,
         color: values.color,
-        continuousTeachingHours: values.maxTeachingHours,
+        continuousTeachingHours: values.continuousTeachingHours,
         availabilities: availabilities.flat(),
         specialtyId: selectedSpecialty || "",
-        schoolUnitId: "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b",
       };
+      console.log("Data to submit:", dataToSubmit);
       await onSubmit(dataToSubmit);
       form.resetFields();
       setAvailabilities(initialAvailability.map(row => [...row]));
@@ -100,7 +100,7 @@ export default function AddEditTeacher({
             firstName: defaultEditValues.name.split(" ")[0],
             lastName: defaultEditValues.name.split(" ")[1] || "",
             mandatoryTeachingHours: defaultEditValues.mandatoryTeachingHours,
-            maxTeachingHours: defaultEditValues.continuousTeachingHours,
+            continuousTeachingHours: defaultEditValues.continuousTeachingHours,
             color: defaultEditValues.color,
             specialty: matchSpecialty(defaultEditValues.specialty),
         });
@@ -177,7 +177,7 @@ export default function AddEditTeacher({
             <ColorPicker onChange={(color) => form.setFieldsValue({ color: color.toHexString() })} />
           </Form.Item>
         </Form.Item>
-        <Form.Item name="maxTeachingHours" label="Μέγιστες συνεχόμενες ώρες διδασκαλίας" initialValue={4}>
+        <Form.Item name="continuousTeachingHours" label="Μέγιστες συνεχόμενες ώρες διδασκαλίας" initialValue={4}>
           <Slider
             min={1}
             max={7}

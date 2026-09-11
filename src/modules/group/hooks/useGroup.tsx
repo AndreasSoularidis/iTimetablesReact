@@ -1,8 +1,8 @@
-import type { GroupGet, GroupEntity } from "../types";
+import type { ISchoolClassResponse, SchoolClassEntity } from "../types";
 
-export function useGroups(requestData: any): GroupEntity[] {
+export function useGroups(requestData: any): SchoolClassEntity[] {
   console.log("useGroups called with requestData:", requestData.schoolClasses);
-  return requestData.schoolClasses.map((group: GroupGet) => ({
+  return requestData.schoolClasses.map((group: ISchoolClassResponse) => ({
     key: group.id,
     name: group.name,
     totalHours: group.totalHours,
@@ -14,7 +14,7 @@ export function useGroups(requestData: any): GroupEntity[] {
   }));
 }
 
-export function useGroup(group: any): GroupEntity {
+export function useGroup(group: any): SchoolClassEntity {
   return {
     key: group.id,
     name: group.name,

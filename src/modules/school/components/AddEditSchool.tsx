@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 
 import axios from "axios";
+import { BASE_URL } from "../../../shared/api/axiosInstance";
 import type { ISchoolCreateRequest, ISchoolResponse } from "../types";
 
 interface IProps {
@@ -51,7 +52,7 @@ export default function AddEditSchool({
   useEffect(() => {
     async function fetchSchoolTypes() {
       try {
-        const response = await axios.get("http://localhost:5191/api/schoolTypes");
+        const response = await axios.get(`${BASE_URL}/schoolTypes`);
         setSchoolTypes(response.data.schoolTypes);
       } catch (error) {
         console.error("Error fetching school types:", error);

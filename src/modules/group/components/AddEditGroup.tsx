@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import type { SchoolClassEntity, ISchoolClassCreateRequest, LookUp } from "../types";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { BASE_URL } from "../../../shared/api/axiosInstance";
 
 const SCHOOL_UNIT_ID = "5a4f28d3-8d80-4e41-b0f3-1a6e741d165b";
 
@@ -75,7 +76,7 @@ export default function AddEditGroup({
 
     async function fetchGrades() {
       try {
-        const response = await axios.get("http://localhost:5191/api/schoolgrades");
+        const response = await axios.get(`${BASE_URL}/schoolgrades`);
         const data  = response.data.schoolGrades
         .sort((a: { id: string; description: string, schoolTypeId: string }, b: { id: string; description: string, schoolTypeId: string }) =>
               a.description.localeCompare(b.description));;
