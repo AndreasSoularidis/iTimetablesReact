@@ -38,7 +38,6 @@ export default function EditUserProfile({
           lastName: values.LastName,
           username: values.Username,
           email: values.Email,
-          createdAt: defaultEditValues!.createdAt,
         };
         await onSubmit(dataToSubmit);
         form.resetFields();
